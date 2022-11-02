@@ -2,15 +2,15 @@ import "./style.css"
 import { styled } from "@mui/system";
 import Divider from "@mui/material/Divider";
 import { useState, useEffect } from 'react';
-import { setPoolPrize, addBlacklist, removeFromBlacklist, getUserTotalInfo, startMiner, toUiSolAmount } from '../../contracts/instructions';
-import { useWallet } from "@solana/wallet-adapter-react";
+// import { setPoolPrize, addBlacklist, removeFromBlacklist, getUserTotalInfo, startMiner, toUiSolAmount } from '../../contracts/instructions';
+// import { useWallet } from "@solana/wallet-adapter-react";
 
 import { useContractContext } from "../../providers/ContractProvider";
 
 import { copyfunc } from '../../Home';
 import { shorten } from "../../Home/components/Connect";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// import { ToastContainer } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 const Item = styled('div')(({ theme }) => ({
     fontSize: '25px',
     display: 'flex',
@@ -69,7 +69,7 @@ const Admin = () => {
     const [userAddress, setUserAddress] = useState('');
     const [userInfo, setUserInfo] = useState(null);
 
-    const wallet = useWallet();
+    // const wallet = useWallet();
 
     const {
       settingsData,
@@ -95,7 +95,7 @@ const Admin = () => {
 
     const onHandlePoolPrizeArg = async () => {
       try {
-        await setPoolPrize(wallet, poolPrizeTime, fee);
+        // await setPoolPrize(wallet, poolPrizeTime, fee);
         refreshData();
       } catch (err) {
         console.error(err);
@@ -103,13 +103,13 @@ const Admin = () => {
     }
 
     const onHandleGetUserInfo = async () => {
-      let info = await getUserTotalInfo(userAddress);
-      setUserInfo(info);
+      // let info = await getUserTotalInfo(userAddress);
+      // setUserInfo(info);
     }
     
     const onHandleBanUser = async () => {
       try {
-        await addBlacklist(wallet, userAddress);
+        // await addBlacklist(wallet, userAddress);
         refreshData();
       } catch (err) {
         console.error(err);
@@ -118,7 +118,7 @@ const Admin = () => {
 
     const onHandleUnblockUser = async () => {
       try {
-        await removeFromBlacklist(wallet, userAddress);
+        // await removeFromBlacklist(wallet, userAddress);
         refreshData();
       } catch (err) {
         console.error(err);
@@ -127,7 +127,7 @@ const Admin = () => {
 
     const onHandleStartMiner = async () => {
       try {
-        await startMiner(wallet);
+        // await startMiner(wallet);
         refreshData();
       } catch (err) {
         console.error(err);
@@ -138,7 +138,7 @@ const Admin = () => {
     console.log("isMobile =", isMobile);
     return (
       <>
-      <ToastContainer
+      {/* <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -148,7 +148,7 @@ const Admin = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-      />
+      /> */}
         <div style={{fontSize:"30px", color:"white"}}>
             {
               (settingsData?.account.minerStarted ?? 0)?"":<MyButton style={{margin:'10px 0px'}} onClick={ onHandleStartMiner }>Start Miner</MyButton>

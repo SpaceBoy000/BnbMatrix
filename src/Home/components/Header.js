@@ -11,8 +11,8 @@ import { GiHamburgerMenu } from "react-icons/gi"
 import Social from "./Social";
 
 import { useContractContext } from "../../providers/ContractProvider";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { PROGRAM_ID, NETWORK } from "../../contracts/constants";
+// import { useWallet } from "@solana/wallet-adapter-react";
+// import { PROGRAM_ID, NETWORK } from "../../contracts/constants";
 
 const Wrapper = styled("div")(({ theme }) => ({
   color: 'white',
@@ -39,8 +39,8 @@ const Item = styled('div')(({ theme }) => ({
 
 export default function Header({onMenu, setOnMenu}) {
 
-  
-  const wallet = useWallet();
+  const PROGRAM_ID = '';
+  // const wallet = useWallet();
   const {
     settingsData,
   } = useContractContext();
@@ -69,7 +69,7 @@ export default function Header({onMenu, setOnMenu}) {
                     to="/miner"
                     className="tab"
                     style={{
-                      color: location.pathname.includes('miner') ? '#14F195' : 'white',
+                      color: location.pathname.includes('miner') ? '#fedd58' : 'white',
                       textDecoration: 'none',
                     }}
                   >
@@ -83,45 +83,45 @@ export default function Header({onMenu, setOnMenu}) {
                     to="/pool"
                     className="tab"
                     style={{
-                      color: location.pathname.includes('pool') ? '#14F195' : 'white',
+                      color: location.pathname.includes('pool') ? '#fedd58' : 'white',
                       textDecoration: 'none',
                     }}
                   >
                     Pool Prize
                   </Link>
                 </div>
-                <div onClick={() => {
+                {/* <div onClick={() => {
                     setOnMenu(false)
                   }}>
                     <Link
                       to="/nft"
                       className="tab"
                       style={{
-                        color: location.pathname.includes('nft') ? '#14F195' : 'white',
+                        color: location.pathname.includes('nft') ? '#fedd58' : 'white',
                         textDecoration: 'none',
                       }}
                     >
                       NFT
                     </Link>
-                  </div>
+                  </div> */}
                 {
-                  wallet && wallet?.publicKey && wallet?.publicKey.toBase58() === 
-                  settingsData?.account.admin.toBase58()?
-                  <div onClick={() => {
-                    setOnMenu(false)
-                  }}>
-                    <Link
-                      to="/admin"
-                      className="tab"
-                      style={{
-                        color: location.pathname.includes('admin') ? '#14F195' : 'white',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      Admin
-                    </Link>
-                  </div>
-                  : <></>
+                  // wallet && wallet?.publicKey && wallet?.publicKey.toBase58() === 
+                  // settingsData?.account.admin.toBase58()?
+                  // <div onClick={() => {
+                  //   setOnMenu(false)
+                  // }}>
+                  //   <Link
+                  //     to="/admin"
+                  //     className="tab"
+                  //     style={{
+                  //       color: location.pathname.includes('admin') ? '#fedd58' : 'white',
+                  //       textDecoration: 'none',
+                  //     }}
+                  //   >
+                  //     Admin
+                  //   </Link>
+                  // </div>
+                  // : <></>
                 }
                 
 
@@ -167,7 +167,7 @@ export default function Header({onMenu, setOnMenu}) {
           <Link
             to="/"
             className='tab'
-            style={{color: location.pathname.includes('miner') ? '#14F195' : 'white'}}
+            style={{color: location.pathname.includes('miner') ? '#fedd58' : 'white'}}
           >
               Miner
           </Link>
@@ -176,33 +176,33 @@ export default function Header({onMenu, setOnMenu}) {
           <Link
             to="pool"
             className='tab'
-            style={{color: location.pathname.includes('pool') ? '#14F195' : 'white'}}
+            style={{color: location.pathname.includes('pool') ? '#fedd58' : 'white'}}
           >
               Pool Prize
           </Link>
         </Item>
-        <Item>
+        {/* <Item>
           <Link
             to="/nft"
             className='tab'
-            style={{color: location.pathname.includes('nft') ? '#14F195' : 'white'}}
+            style={{color: location.pathname.includes('nft') ? '#fedd58' : 'white'}}
           >
               NFT
           </Link>
-        </Item>
+        </Item> */}
         {
-          wallet && wallet?.publicKey && wallet?.publicKey.toBase58() === 
-          settingsData?.account.admin.toBase58()?
-            <Item>
-              <Link
-                to="/admin"
-                className='tab'
-                style={{color: location.pathname.includes('admin') ? '#14F195' : 'white'}}
-              >
-                  Admin
-              </Link>
-            </Item>
-          : <></>
+          // wallet && wallet?.publicKey && wallet?.publicKey.toBase58() === 
+          // settingsData?.account.admin.toBase58()?
+            // <Item>
+            //   <Link
+            //     to="/admin"
+            //     className='tab'
+            //     style={{color: location.pathname.includes('admin') ? '#fedd58' : 'white'}}
+            //   >
+            //       Admin
+            //   </Link>
+            // </Item>
+          // : <></>
         }
         <Divider />
         <Item>

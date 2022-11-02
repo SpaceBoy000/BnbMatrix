@@ -1,81 +1,55 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import Web3 from "web3";
+
+import abi from "../contracts/abi.json";
+import { useAuthContext } from "./AuthProvider";
 import { config } from "../config";
-import {
-  getWalletSolBalance,
-  getVaultSolBalance,
-  getSettings,
-  getUserState,
-  getUserInvestDataList,
-  getBlackList
-} from "../contracts/instructions"
 
 export const ContractContext = createContext({
-  settingsData: null,
-  userMatrixList: [],
-  blacklist: [],
-  userData: null,
-  walletSolBalance: 0,
-  contractSolBalance: 0,
-  refreshData: () => {},
+  contract: null,
+  web: null,
+  wrongNetwork: false,
+  getBnbBalance: () => null,
+  fromWei: () => null,
+  toWei: () => null,
 });
 
 export const ContractProvider = ({ children }) => {
-  const [walletSolBalance, setWalletSolBalance] = useState("0");
-  const [contractSolBalance, setContractSolBalance] = useState("0");
-  const [dataUpdate, setDataUpdate] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const [settingsData, setSettingsData] = useState(null);
-  const [userMatrixList, setUserMatrixList] = useState([]);
-  const [blacklist, setBlacklist] = useState([]);
-  const wallet = useWallet();
+  const [contract, setContract] = useState();
+  const [web3, setWeb3] = useState();
+  const { chainId, setSnackbar } = useAuthContext();
+  const [wrongNetwork, setWrongNetwork] = useState(false);
 
   useEffect(() => {
-    console.log("refresh");
-    if (wallet && wallet.publicKey) {
-      getUserInvestDataList(wallet.publicKey).then(data => {
-        setUserMatrixList(data.sort((a, b) => (a?.account.investTime?.toNumber() - b?.account.investTime?.toNumber())));
-      });
-    } else {
-      setUserMatrixList([]);
+    if (!chainId) {
+      return;
     }
-    getWalletSolBalance(wallet).then(bal => {
-      console.log('refresh wallet sol balance =', bal);
-      setWalletSolBalance(bal);
-    });
-    getUserState(wallet.publicKey).then(data => {
-      if (data !== null) {
-        console.log('refresh userstate =', data);
-        setUserData(data);
-      }
-    });
-    getSettings().then(data => {
-      if (data !== null) {
-        console.log('refresh settings =', data);
-        setSettingsData(data);
-      }
-    });
-    getVaultSolBalance(wallet).then(bal => {
-      console.log('refresh vault sol balance =', bal);
-      setContractSolBalance(bal);
-    });
-    getBlackList().then((v) => {
-      console.log('refresh blacklist =', v);
-      setBlacklist(v);
-    })
-  }, [wallet, dataUpdate]);
+    if (parseInt(chainId) !== config.chainId) {
+      setSnackbar({
+        type: "error",
+        message: "Wrong network",
+      });
+      setWrongNetwork(true);
+      return;
+    }
+    setWrongNetwork(false);
+    const web3Instance = new Web3();
+    web3Instance.setProvider(Web3.givenProvider);
+
+    setWeb3(web3Instance);
+    const contract = new web3Instance.eth.Contract(abi, config.contractAddress);
+    setContract(contract);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chainId]);
+
+  const getBnbBalance = (address) => web3.eth.getBalance(address);
+  const fromWei = (wei, unit = "ether") =>
+    parseFloat(Web3.utils.fromWei(wei, unit)).toFixed(3);
+  const toWei = (amount, unit = "ether") => Web3.utils.toWei(amount, unit);
 
   return (
     <ContractContext.Provider
-      value={{ 
-        settingsData,
-        userMatrixList,
-        userData,
-        walletSolBalance,
-        contractSolBalance,
-        blacklist,
-        refreshData: () => setDataUpdate(!dataUpdate)
-      }}
+      value={{ web3, contract, wrongNetwork, getBnbBalance, fromWei, toWei }}
     >
       {children}
     </ContractContext.Provider>
@@ -83,4 +57,3 @@ export const ContractProvider = ({ children }) => {
 };
 
 export const useContractContext = () => useContext(ContractContext);
-

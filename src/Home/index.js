@@ -7,14 +7,14 @@ import { Toast } from "../utils";
 import { useEffect, useState } from "react";
 import Matrix from "../components/Matrix";
 
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// import { ToastContainer } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 
-import { useWallet } from "@solana/wallet-adapter-react";
-import { deposit, compound, toUiSolAmount, unstake } from "../contracts/instructions";
+// import { useWallet } from "@solana/wallet-adapter-react";
+// import { deposit, compound, toUiSolAmount, unstake } from "../contracts/instructions";
 import { useContractContext } from "../providers/ContractProvider";
-import * as Constants from '../contracts/constants';
-import { showToast } from "../contracts/utils";
+// import * as Constants from '../contracts/constants';
+// import { showToast } from "../contracts/utils";
 import MiningTimer from "./components/MiningTimer.js";
 
 const Wrapper = styled("div")(({ theme }) => ({
@@ -97,14 +97,14 @@ export default function Home() {
             }
         }, 1000);
 
-        setTimeout(() => {
-          if (wallet.publicKey) refreshData();
-        }, 30000);
+        // setTimeout(() => {
+        //   if (wallet.publicKey) refreshData();
+        // }, 30000);
 
         return () => clearInterval(interval);
     }, [])
 
-  const wallet = useWallet();
+  // const wallet = useWallet();
   const {
     settingsData,
     userMatrixList,
@@ -118,24 +118,24 @@ export default function Home() {
 
   });
 
-  useEffect(() => {
-    const refData = async () => {
-      if (wallet.publicKey) {
-        const refLink = `${window.origin}/miner?ref=${wallet.publicKey.toBase58()}`;
-        setRefLink(refLink);
-      } else {
-        setRefLink('Copy Referral Link');
-      }
-    };
+  // useEffect(() => {
+  //   const refData = async () => {
+  //     if (wallet.publicKey) {
+  //       const refLink = `${window.origin}/miner?ref=${wallet.publicKey.toBase58()}`;
+  //       setRefLink(refLink);
+  //     } else {
+  //       setRefLink('Copy Referral Link');
+  //     }
+  //   };
 
-    refData();
-  }, [wallet.publicKey]);
+  //   refData();
+  // }, [wallet.publicKey]);
 
   const onInvestClick = async () => {
     setLoading(true);
     try {
       let ref = getRef();
-      await deposit(wallet, amount, ref, () => isStarted());
+      // await deposit(wallet, amount, ref, () => isStarted());
     } catch (err) {
       console.error(err);
     }
@@ -148,7 +148,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      await compound(wallet, userMatrixList[matrixId]?.publicKey);
+      // await compound(wallet, userMatrixList[matrixId]?.publicKey);
     } catch (err) {
       console.error(err);
     }
@@ -160,7 +160,7 @@ export default function Home() {
     if (!isStarted()) return;
     setLoading(true);
     try {
-      await unstake(wallet, userMatrixList[matrixId]?.publicKey);
+      // await unstake(wallet, userMatrixList[matrixId]?.publicKey);
     } catch (err) {
       console.error(err);
     }
@@ -170,7 +170,7 @@ export default function Home() {
 
   const isStarted = () => {
     if (!settingsData || settingsData.account.minerStarted === 0) {
-      showToast("Miner is not started.", 1500, 2);
+      // showToast("Miner is not started.", 1500, 2);
       return false;
     }
     return true;
@@ -181,7 +181,7 @@ export default function Home() {
 
   return (
     <>
-    <ToastContainer
+    {/* <ToastContainer
       position="top-right"
       autoClose={5000}
       hideProgressBar={false}
@@ -191,7 +191,7 @@ export default function Home() {
       pauseOnFocusLoss
       draggable
       pauseOnHover
-    />
+    /> */}
     <Wrapper>
       <MiningTimer/>
       <div className='contractInfo'>
@@ -215,7 +215,7 @@ export default function Home() {
   </div>*/}
 
       <div className="investCard">
-        {
+        {/* {
           userMatrixList.map((matrix, i) => (
               <>
                 <Matrix data = {matrix} index = {i} onCompound={onCompound} onClaim={onClaim}/>
@@ -226,8 +226,8 @@ export default function Home() {
               </>
             )
           )
-        }
-        {userMatrixList.length < 2 ? 
+        } */}
+        {/* {userMatrixList.length < 2 ? 
           <div style={{minWidth: isMobile ? '100px' : "40%"}}>
             <div className="invest_title tt">New Matrix</div>
             <div style={{fontSize: '20px'}}>Invest to enter the Matrix</div>
@@ -242,7 +242,7 @@ export default function Home() {
               />
               <button className="myButton_invest" onClick={onInvestClick}>Invest</button>
             </div>
-          </div> : <></>}
+          </div> : <></>} */}
       </div>
       <div style={{flex:'1'}}/>
       <div className="refInfo">
@@ -262,7 +262,7 @@ export default function Home() {
           </div>
           <div className="ref_item">
             <span>Referral Rewards</span>
-            <span className="nn">{toUiSolAmount(userData?.account.referralReward?.toNumber() ?? 0 )} Sol</span>
+            {/* <span className="nn">{toUiSolAmount(userData?.account.referralReward?.toNumber() ?? 0 )} Sol</span> */}
           </div>
           <button className="refBtn2" style={{border:'none', fontFamily: 'lightPolice',background:'black', color:'white', width:'100%', padding:'5px'}} onClick={ () => {copyfunc(refLink)} }>Click to Copy</button>
         </div>

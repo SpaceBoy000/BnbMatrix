@@ -5,14 +5,14 @@ import { shorten } from "../../Home/components/Connect";
 
 import { useContractContext } from "../../providers/ContractProvider";
 
-import { getLastWinner, getLastDepositUser } from "../../contracts/instructions";
+// import { getLastWinner, getLastDepositUser } from "../../contracts/instructions";
 
 import { copyfunc } from '../../Home';
 
 const Wrapper = styled("div")(({ theme }) => ({
     color: 'white',
     textAlign: 'center',
-    background: "linear-gradient(90deg, #9945FF 15%, #14F195 84%, #14F195 100%)",
+    background: "linear-gradient(90deg, #fedd58 15%, #eec433 84%, #e0ae13 100%)",
     fontSize:'20px',
     height: '100%',
     [theme.breakpoints.down("md")]: {
@@ -113,15 +113,15 @@ const Pool = () => {
             { countdown.alive && <>{ `${countdown.hours.toString().padStart(2, '0')} : ${countdown.minutes.toString().padStart(2, '0')} : ${countdown.seconds.toString().padStart(2, '0')}`}</>}
           </div>
           <div style={{fontSize: isMobile ? '40px' : '60px', color: isMobile ? 'white': '#14F195', padding:'30px'}}>
-          { settingsData ? Number(contractSolBalance * settingsData.account.poolPrizeRatio / 10000).toFixed(4) : 0 } Sol
+          { settingsData ? Number(contractSolBalance * settingsData.account.poolPrizeRatio / 10000).toFixed(4) : 0 } BNB
 
           </div>
           <div>
             Last Deposit Address
           </div>
-          <div style={{color:'black', fontWeight:'bolder', padding:'5px', cursor:'pointer'}} onClick={() => {copyfunc(getLastDepositUser(settingsData))}}>
+          {/* <div style={{color:'black', fontWeight:'bolder', padding:'5px', cursor:'pointer'}} onClick={() => {copyfunc(getLastDepositUser(settingsData))}}>
             { isMobile ? shorten(getLastDepositUser(settingsData)) : getLastDepositUser(settingsData) }
-          </div>
+          </div> */}
           <div>
             {!countdown.alive?<span style={{color: 'green'}}> Won Prize! </span>:""}
           </div>
@@ -130,14 +130,14 @@ const Pool = () => {
             Prize Pool will automatically be credited to your wallet via the smart contract.
           </div>
           <div style={{padding:'10px'}}>
-            The Pool Prize corresponds to {Number(settingsData?.account?.poolPrizeRatio / 100 ?? 0).toFixed(0)}% of the Total Value Locked.
-          </div>
-          <div onClick={() => {copyfunc(getLastWinner(settingsData).winner)}}>
+            The Pool Prize corresponds to {Number(settingsData?.account?.poolPrizeRatio / 100 ?? 0).toFixed(0)}% of all new deposits.
+          </div>.
+          {/* <div onClick={() => {copyfunc(getLastWinner(settingsData).winner)}}>
             Last Winner: { isMobile ? shorten(getLastWinner(settingsData).winner) : getLastWinner(settingsData).winner }
-          </div>
-          <div>
+          </div> */}
+          {/* <div>
             Last Prize: {getLastWinner(settingsData).prize}
-          </div>
+          </div> */}
         </Wrapper>
     );
 }

@@ -1,9 +1,9 @@
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/system";
-import { bn2uiNum, remainDays } from '../contracts/utils';
-import * as Constants from '../contracts/constants';
-import { getTimeToNextCompound } from '../contracts/instructions';
+// import { bn2uiNum, remainDays } from '../contracts/utils';
+// import * as Constants from '../contracts/constants';
+// import { getTimeToNextCompound } from '../contracts/instructions';
 import { useMemo, useEffect, useState } from "react";
 
 const Wrapper = styled("div")(({ theme }) => ({
@@ -41,7 +41,8 @@ export default function Matrix({ index, data, onClaim, onCompound }) {
   const getCompoundStr = () => {
     let {
       h, m, s, notiStr, time
-    } = getTimeToNextCompound(data.account);
+    } =[]; 
+    // getTimeToNextCompound(data.account);
 
     const hStr = h.toString().padStart(2, '0');
     const mStr = m.toString().padStart(2, '0');
@@ -58,7 +59,7 @@ export default function Matrix({ index, data, onClaim, onCompound }) {
 
   const getROI = () => {
     if (data.account.days.toNumber() === 65) return 200;
-    return Number(Math.pow(Constants.ROI / Constants.FEE_DIVIDER, data.account.days) * 95).toFixed(2);
+    // return Number(Math.pow(Constants.ROI / Constants.FEE_DIVIDER, data.account.days) * 95).toFixed(2);
   };
 
   return (
@@ -68,11 +69,11 @@ export default function Matrix({ index, data, onClaim, onCompound }) {
       </div>
       <div style={{display:'flex', justifyContent:'space-between', margin:'10px 0px'}}>
         <div>Amount Invested</div>
-        <div className="nn">{ bn2uiNum(data.account.amount) } Sol</div>
+        {/* <div className="nn">{ bn2uiNum(data.account.amount) } Sol</div> */}
       </div>
       <div style={{display:'flex', justifyContent:'space-between', margin:'10px 0px'}}>
         <div>Active Balance</div>
-        <div className="nn">{ bn2uiNum(data.account.activeBalance)} Sol</div>
+        {/* <div className="nn">{ bn2uiNum(data.account.activeBalance)} Sol</div> */}
       </div>
       <div style={{display:'flex', justifyContent:'space-between', margin:'10px 0px'}}>
         <div>ROI</div>
