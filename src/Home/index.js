@@ -47,6 +47,7 @@ export default function Home() {
   const { address, chainId } = useAuthContext();
 
   const [contractBNB, setContractBNB] = useState(0);
+  const [memberCount, setMemberCount] = useState(0);
   const [walletBalance, setWalletBalance] = useState(0);
   const [userMatrixList, setUserMatrixList] = useState([]);
   const [refLink, setRefLink] = useState('Copy Referral Link');
@@ -105,6 +106,7 @@ export default function Home() {
       if (!web3 || wrongNetwork || !address) {
         setWalletBalance(0);
         setUserMatrixList([]);
+        setMemberCount(0);
         // setCompoundTimes(0);
         // setInitialDeposit(0);
         // setTotalDeposit(0);
@@ -115,7 +117,7 @@ export default function Home() {
       }
       
       try {
-        const [walletBalance, userMatrixList, /*mainKey, usersKey, currentRewards*/] = await Promise.all([
+        const [walletBalance, userMatrixList, memberCount/*mainKey, usersKey, currentRewards*/] = await Promise.all([
           getBnbBalance(address),
           // contract.methods.MainKey(1)
           //   .call()
@@ -125,6 +127,12 @@ export default function Home() {
           //   }),
           contract.methods.userInfo()
             .call({from: address})
+            .catch((err) => {
+            console.error('user info error: ', err);
+            return;
+          }),
+          contract.methods.MEMBER_COUNT()
+            .call()
             .catch((err) => {
             console.error('user info error: ', err);
             return;
@@ -146,6 +154,7 @@ export default function Home() {
         console.log("Wallet Balance: ", fromWei(walletBalance));
         setUserMatrixList(userMatrixList);
         console.log("UserInfo: ", userMatrixList);
+        setMemberCount(memberCount);
         // setUserCount(mainKey.users);
         // setTotalDeposit(fromWei(mainKey.ovrTotalDeps));
         // console.log('usersKey=> ', usersKey);
@@ -158,6 +167,7 @@ export default function Home() {
       } catch (err) {
         console.error(err);
         setWalletBalance(0);
+        setMemberCount(0);
         setUserMatrixList([]);
         
         // setInitialDeposit(0);
@@ -241,7 +251,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      // await compound(wallet, userMatrixList[matrixId]?.publicKey);
+      await contract.methods.Compound(matrixId).send({from: address});
     } catch (err) {
       console.error(err);
     }
@@ -253,7 +263,7 @@ export default function Home() {
     if (!isStarted()) return;
     setLoading(true);
     try {
-      // await unstake(wallet, userMatrixList[matrixId]?.publicKey);
+      await contract.methods.Withdraw(matrixId).send({from: address});
     } catch (err) {
       console.error(err);
     }
@@ -294,7 +304,7 @@ export default function Home() {
         </div>
         <div className="contractInfoItem">
           <span className="tt">Organization</span>
-          <span className='nn'>{0} Members</span>
+          <span className='nn'>{ memberCount } Members</span>
         </div> 
       </div>
       <div style={{flex:'1'}}/>

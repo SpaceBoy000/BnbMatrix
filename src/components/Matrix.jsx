@@ -5,6 +5,7 @@ import { styled } from "@mui/system";
 // import * as Constants from '../contracts/constants';
 // import { getTimeToNextCompound } from '../contracts/instructions';
 import { useMemo, useEffect, useState } from "react";
+import { useContractContext } from "../providers/ContractProvider";
 
 const Wrapper = styled("div")(({ theme }) => ({
   position: "relative",
@@ -30,6 +31,8 @@ const Wrapper = styled("div")(({ theme }) => ({
 }));
 
 export default function Matrix({ index, data, onClaim, onCompound }) {
+  // console.log("Matrix ", index, " : ", data);
+  const { fromWei } = useContractContext();
   const [compoundStr, setCompoundStr] = useState("Compound");
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,15 +42,13 @@ export default function Matrix({ index, data, onClaim, onCompound }) {
   }, [data])
 
   const getCompoundStr = () => {
-    let {
-      h, m, s, notiStr, time
-    } =[]; 
-    // getTimeToNextCompound(data.account);
-
+    let time = (Number(data.lastAction) + 86400) - Date.now() / 1000;
+    let h = Math.floor(time / 3600);
+    let m = Math.floor((time - 3600 * h) / 60);
+    let s = Math.floor(time - 3600 * h - 60 * m);
     const hStr = h.toString().padStart(2, '0');
     const mStr = m.toString().padStart(2, '0');
     const sStr = s.toString().padStart(2, '0');
-
     if (time > 0) {
       let str = "";
       if (h > 0) str = `${hStr}:${mStr}:${sStr}`;
@@ -69,11 +70,11 @@ export default function Matrix({ index, data, onClaim, onCompound }) {
       </div>
       <div style={{display:'flex', justifyContent:'space-between', margin:'10px 0px'}}>
         <Typography variant='body2'>Amount Invested</Typography>
-        <Typography variant='body3'>{ 0 } BNB</Typography>
+        <Typography variant='body3'>{ fromWei(data.initAmount) } BNB</Typography>
       </div>
       <div style={{display:'flex', justifyContent:'space-between', margin:'10px 0px'}}>
         <Typography variant='body2'>Active Balance</Typography>
-        <Typography variant='body3'>{ 0 } BNB</Typography>
+        <Typography variant='body3'>{ fromWei(data.curAmount) } BNB</Typography>
       </div>
       <div style={{display:'flex', justifyContent:'space-between', margin:'10px 0px'}}>
         <Typography variant='body2'>ROI</Typography>
