@@ -13,6 +13,7 @@ import Matrix from "../components/Matrix";
 // import { useWallet } from "@solana/wallet-adapter-react";
 // import { deposit, compound, toUiSolAmount, unstake } from "../contracts/instructions";
 import { useContractContext } from "../providers/ContractProvider";
+import { useAuthContext } from "../providers/AuthProvider";
 // import * as Constants from '../contracts/constants';
 // import { showToast } from "../contracts/utils";
 import MiningTimer from "./components/MiningTimer.js";
@@ -41,6 +42,11 @@ export const copyfunc = async (text) => {
 }
 
 export default function Home() {
+  const { web3, contract, wrongNetwork, getBnbBalance, fromWei, toWei } = useContractContext();
+  const { address, chainId } = useAuthContext();
+
+  const [contractBNB, setContractBNB] = useState(0);
+  const [walletBalance, setWalletBalance] = useState(0);
   const [refLink, setRefLink] = useState('Copy Referral Link');
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -81,6 +87,90 @@ export default function Home() {
         };
     }
 
+    const fetchContractBNBBalance = async () => {
+      if (!web3 || wrongNetwork) {
+        setContractBNB(0);
+        return;
+      }
+      await contract.methods.getBalance().call().then((amount) => {
+        setContractBNB(fromWei(amount));
+      });
+    };
+  
+    const fetchWalletBalance = async () => {
+      if (!web3 || wrongNetwork || !address) {
+        setWalletBalance(0);
+        // setCompoundTimes(0);
+        // setInitialDeposit(0);
+        // setTotalDeposit(0);
+        // setTotalClaimed(0);
+        // setTotalReferralRewards(0);
+        // setEstimatedMinerRate(0);
+        return;
+      }
+      
+      try {
+        const [walletBalance, /*mainKey, userInfo, usersKey, currentRewards*/] = await Promise.all([
+          getBnbBalance(address),
+          // contract.methods.MainKey(1)
+          //   .call()
+          //   .catch((err) => {
+          //     console.error("userInfo error", err);
+          //     return 0;
+          //   }),
+          // contract.methods.userInfo()
+          //   .call({from: address})
+          //   .catch((err) => {
+          //   console.error('user info error: ', err);
+          //   return;
+          // }),
+          // contract.methods.UsersKey(address)
+          //   .call()
+          //   .catch((err) => {
+          //   console.error('user info error: ', err);
+          //   return;
+          // }),
+          // contract.methods.calcdiv(address)
+          //   .call()
+          //   .catch((err) => {
+          //   console.error('user info error: ', err);
+          //   return;
+          // })
+        ]);
+        setWalletBalance(fromWei(walletBalance));
+        console.log("Wallet Balance: ", fromWei(walletBalance));
+        // setUserCount(mainKey.users);
+        // setTotalDeposit(fromWei(mainKey.ovrTotalDeps));
+        // console.log('usersKey=> ', usersKey);
+        // setUserInfo(userInfo);
+        // setInitialDeposit(fromWei(usersKey.totalInits.toString()));
+        // setRefBonus(fromWei(usersKey.refBonus.toString()));
+        // setTotalClaimed(fromWei(usersKey.totalAccrued.toString()));
+        // setTotalReferralRewards(fromWei(usersKey.totalWithRefBonus.toString()));
+        // setCurrentRewards(fromWei(currentRewards.toString()));
+      } catch (err) {
+        console.error(err);
+        setWalletBalance(0);
+        
+        // setInitialDeposit(0);
+        // setTotalDeposit(0);
+        // setTotalClaimed(0);
+        // setTotalReferralRewards(0);
+        // setEstimatedMinerRate(0);
+      }
+    };
+
+    useEffect(() => {
+      fetchContractBNBBalance();
+      console.log("Home fetchContractBNBBalance");
+
+    }, [web3, chainId]);
+  
+    useEffect(() => {
+      fetchWalletBalance();
+      console.log("Home fetchWalletBalance");
+    }, [address, web3, chainId]);
+
     useEffect(() => {
         const interval = setInterval(() => {
             try {
@@ -104,19 +194,6 @@ export default function Home() {
         return () => clearInterval(interval);
     }, [])
 
-  // const wallet = useWallet();
-  const {
-    settingsData,
-    userMatrixList,
-    userData,
-    walletSolBalance,
-    contractSolBalance,
-    refreshData,
-  } = useContractContext();
-
-  useEffect(() => {
-
-  });
 
   // useEffect(() => {
   //   const refData = async () => {
@@ -141,6 +218,10 @@ export default function Home() {
     }
     setLoading(false);
     refreshData();
+  }
+
+  const refreshData = () => {
+    return true;
   }
 
   const onCompound = async (matrixId) => {
@@ -169,10 +250,6 @@ export default function Home() {
   }
 
   const isStarted = () => {
-    if (!settingsData || settingsData.account.minerStarted === 0) {
-      // showToast("Miner is not started.", 1500, 2);
-      return false;
-    }
     return true;
   }
 
@@ -197,7 +274,7 @@ export default function Home() {
       <div className='contractInfo'>
         <div className="contractInfoItem">
           <span className="tt">Total Value Locked</span>
-          <span className='nn'>{Number(contractSolBalance).toFixed(3)} SOL</span>
+          <span className='nn'>{Number(contractBNB).toFixed(3)} BNB</span>
         </div>
         <div className="contractInfoItem">
           <span className="tt">Daily ROI</span>
@@ -205,7 +282,7 @@ export default function Home() {
         </div>
         <div className="contractInfoItem">
           <span className="tt">Organization</span>
-          <span className='nn'>{settingsData?.account.members?.toNumber() ?? 0} Members</span>
+          <span className='nn'>{0} Members</span>
         </div> 
       </div>
       <div style={{flex:'1'}}/>
@@ -258,7 +335,7 @@ export default function Home() {
           </div>
           <div className="ref_item">
             <span>Members Referred</span>
-            <span className="nn">{userData?.account.referredCount?.toNumber() ?? 0} Members</span>
+            <span className="nn">{0} Members</span>
           </div>
           <div className="ref_item">
             <span>Referral Rewards</span>

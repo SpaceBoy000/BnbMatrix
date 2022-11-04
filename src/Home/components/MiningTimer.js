@@ -31,7 +31,7 @@ export default function MiningTimer() {
   useEffect(() => {
     const intervalID = setInterval(() => {
       try {
-        const data_ = getCountdown(1667145600);
+        const data_ = getCountdown(deployTime);
 
         setCountup({
           alive: data_.total > 0,
@@ -67,15 +67,11 @@ export default function MiningTimer() {
 }
 
   const getMiningTitle = () => {
-    const last = 1667145600;
-    // const last = deployTime.getTime() / 1000;
     const now = Date.now() / 1000;
-
-    console.log("now:", now, " last:", last);
-    if (now < last) {
-      return "MINING STARTS IN ";
+    if ( now < deployTime) {
+      return "MINING STARTS IN: ";
     } else {
-      return "RUNNING TIME ";
+      return "RUNNING TIME: ";
     }
   }
 
