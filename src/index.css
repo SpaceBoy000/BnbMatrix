@@ -12,6 +12,7 @@
 
 .tt {
   font-family: mediumPolice;
+  color: black;
 }
 
 .nn {
@@ -123,6 +124,7 @@ code {
   font-size: 25px;
   padding: 10px 0;
   font-family: mediumPolice;
+  color: black;
 }
 
 .refInfo {

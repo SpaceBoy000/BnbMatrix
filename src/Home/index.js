@@ -1,12 +1,12 @@
 import { styled } from "@mui/system";
-
+import { Typography } from "@mui/material";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useLocation } from "react-router-dom";
 import Divider from "@mui/material/Divider";
 import { Toast } from "../utils";
 import { useEffect, useState } from "react";
 import Matrix from "../components/Matrix";
-
+import Web3 from "web3";
 // import { ToastContainer } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 
@@ -17,6 +17,7 @@ import { useAuthContext } from "../providers/AuthProvider";
 // import * as Constants from '../contracts/constants';
 // import { showToast } from "../contracts/utils";
 import MiningTimer from "./components/MiningTimer.js";
+import { extractEventHandlers } from "@mui/base";
 
 const Wrapper = styled("div")(({ theme }) => ({
   height: '100%',
@@ -47,6 +48,7 @@ export default function Home() {
 
   const [contractBNB, setContractBNB] = useState(0);
   const [walletBalance, setWalletBalance] = useState(0);
+  const [userMatrixList, setUserMatrixList] = useState([]);
   const [refLink, setRefLink] = useState('Copy Referral Link');
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -58,7 +60,9 @@ export default function Home() {
   }
   const query = useQuery();
   const getRef = () => {
-    const ref = query.get("ref");
+    const ref = Web3.utils.isAddress(query.get("ref"))
+      ? query.get("ref")
+      : '0x0000000000000000000000000000000000000000'
     return ref;
   };
 
@@ -100,6 +104,7 @@ export default function Home() {
     const fetchWalletBalance = async () => {
       if (!web3 || wrongNetwork || !address) {
         setWalletBalance(0);
+        setUserMatrixList([]);
         // setCompoundTimes(0);
         // setInitialDeposit(0);
         // setTotalDeposit(0);
@@ -110,7 +115,7 @@ export default function Home() {
       }
       
       try {
-        const [walletBalance, /*mainKey, userInfo, usersKey, currentRewards*/] = await Promise.all([
+        const [walletBalance, userMatrixList, /*mainKey, usersKey, currentRewards*/] = await Promise.all([
           getBnbBalance(address),
           // contract.methods.MainKey(1)
           //   .call()
@@ -118,12 +123,12 @@ export default function Home() {
           //     console.error("userInfo error", err);
           //     return 0;
           //   }),
-          // contract.methods.userInfo()
-          //   .call({from: address})
-          //   .catch((err) => {
-          //   console.error('user info error: ', err);
-          //   return;
-          // }),
+          contract.methods.userInfo()
+            .call({from: address})
+            .catch((err) => {
+            console.error('user info error: ', err);
+            return;
+          }),
           // contract.methods.UsersKey(address)
           //   .call()
           //   .catch((err) => {
@@ -139,10 +144,12 @@ export default function Home() {
         ]);
         setWalletBalance(fromWei(walletBalance));
         console.log("Wallet Balance: ", fromWei(walletBalance));
+        setUserMatrixList(userMatrixList);
+        console.log("UserInfo: ", userMatrixList);
         // setUserCount(mainKey.users);
         // setTotalDeposit(fromWei(mainKey.ovrTotalDeps));
         // console.log('usersKey=> ', usersKey);
-        // setUserInfo(userInfo);
+        
         // setInitialDeposit(fromWei(usersKey.totalInits.toString()));
         // setRefBonus(fromWei(usersKey.refBonus.toString()));
         // setTotalClaimed(fromWei(usersKey.totalAccrued.toString()));
@@ -151,6 +158,7 @@ export default function Home() {
       } catch (err) {
         console.error(err);
         setWalletBalance(0);
+        setUserMatrixList([]);
         
         // setInitialDeposit(0);
         // setTotalDeposit(0);
@@ -208,11 +216,15 @@ export default function Home() {
   //   refData();
   // }, [wallet.publicKey]);
 
-  const onInvestClick = async () => {
+  const onInvest = async () => {
     setLoading(true);
     try {
       let ref = getRef();
-      // await deposit(wallet, amount, ref, () => isStarted());
+      console.log("Ref = ", ref);
+      console.log("Invest Amount = ", toWei(amount));
+      await contract.methods.Deposit(ref).send({from: address, value:toWei(amount)});
+      fetchWalletBalance();
+      fetchContractBNBBalance();
     } catch (err) {
       console.error(err);
     }
@@ -292,7 +304,7 @@ export default function Home() {
   </div>*/}
 
       <div className="investCard">
-        {/* {
+        {
           userMatrixList.map((matrix, i) => (
               <>
                 <Matrix data = {matrix} index = {i} onCompound={onCompound} onClaim={onClaim}/>
@@ -303,23 +315,23 @@ export default function Home() {
               </>
             )
           )
-        } */}
-        {/* {userMatrixList.length < 2 ? 
+        }
+        {userMatrixList.length < 2 ? 
           <div style={{minWidth: isMobile ? '100px' : "40%"}}>
             <div className="invest_title tt">New Matrix</div>
-            <div style={{fontSize: '20px'}}>Invest to enter the Matrix</div>
+            <Typography variant='body2'>Invest to enter the Matrix</Typography>
             <div style={{margin: '20px 0px 40px 0px', display: 'flex'}}>
               <input
-                placeholder="1 Sol"
+                placeholder="1 BNB"
                 // type='number'
                 value={ amount }
                 onChange={(e) =>{setAmount(e.target.value)}}
                 className='nn'
                 style={{width: '120px', marginRight:'20px', padding:'5px 10px', border:'none'}}
               />
-              <button className="myButton_invest" onClick={onInvestClick}>Invest</button>
+              <button className="myButton_invest" onClick={onInvest}>Invest</button>
             </div>
-          </div> : <></>} */}
+          </div> : <></>}
       </div>
       <div style={{flex:'1'}}/>
       <div className="refInfo">
@@ -339,7 +351,7 @@ export default function Home() {
           </div>
           <div className="ref_item">
             <span>Referral Rewards</span>
-            {/* <span className="nn">{toUiSolAmount(userData?.account.referralReward?.toNumber() ?? 0 )} Sol</span> */}
+            {/* <span className="nn">{toUiSolAmount(userData?.account.referralReward?.toNumber() ?? 0 )} BNB</span> */}
           </div>
           <button className="refBtn2" style={{border:'none', fontFamily: 'lightPolice',background:'black', color:'white', width:'100%', padding:'5px'}} onClick={ () => {copyfunc(refLink)} }>Click to Copy</button>
         </div>

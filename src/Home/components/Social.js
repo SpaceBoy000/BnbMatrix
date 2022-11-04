@@ -18,7 +18,7 @@ const CardWrapper = styled("div")(({ theme }) => ({
   // margin: "0 auto",
   transition: "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
   overflow: "hidden",
-  boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
+  // boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
   borderRadius: "5px",
   // background: theme.palette.primary.main,
   marginBottom: 24,

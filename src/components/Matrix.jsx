@@ -57,10 +57,10 @@ export default function Matrix({ index, data, onClaim, onCompound }) {
     return "Compound";
   };
 
-  const getROI = () => {
-    if (data.account.days.toNumber() === 65) return 200;
-    // return Number(Math.pow(Constants.ROI / Constants.FEE_DIVIDER, data.account.days) * 95).toFixed(2);
-  };
+  // const getROI = () => {
+  //   if (data.account.days.toNumber() === 65) return 200;
+  //   // return Number(Math.pow(Constants.ROI / Constants.FEE_DIVIDER, data.account.days) * 95).toFixed(2);
+  // };
 
   return (
     <Wrapper>
@@ -68,16 +68,16 @@ export default function Matrix({ index, data, onClaim, onCompound }) {
         Matrix {index + 1}
       </div>
       <div style={{display:'flex', justifyContent:'space-between', margin:'10px 0px'}}>
-        <div>Amount Invested</div>
-        {/* <div className="nn">{ bn2uiNum(data.account.amount) } Sol</div> */}
+        <Typography variant='body2'>Amount Invested</Typography>
+        <Typography variant='body3'>{ 0 } BNB</Typography>
       </div>
       <div style={{display:'flex', justifyContent:'space-between', margin:'10px 0px'}}>
-        <div>Active Balance</div>
-        {/* <div className="nn">{ bn2uiNum(data.account.activeBalance)} Sol</div> */}
+        <Typography variant='body2'>Active Balance</Typography>
+        <Typography variant='body3'>{ 0 } BNB</Typography>
       </div>
       <div style={{display:'flex', justifyContent:'space-between', margin:'10px 0px'}}>
-        <div>ROI</div>
-        <div className="nn">{ getROI() } %</div>
+        <Typography variant='body2'>ROI</Typography>
+        <Typography variant='body3'>{ 0 } %</Typography>
       </div>
       <div style={{display:'flex', justifyContent:'space-around', marginTop: '15px' }}>
         <button className="myButton1 myButton" style={{backgroundColor: 'black'}} onClick = {() => onCompound(index)}>{

@@ -29,8 +29,15 @@ const theme = createTheme({
       fontSize: 20,
       fontWeight: "bolder",
     },
-    body2: {
-      fontSize: 16,
+    body2: {  //Amount Invested
+      fontFamily: 'mediumPolice',
+      fontSize: '20px',
+      color: 'black'
+    },
+    body3: {  // number balance
+      fontFamily: 'lightPolice',
+      fontSize: '20px',
+      color: 'white'
     },
     body5: {
       fontSize: 40,
