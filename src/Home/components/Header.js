@@ -11,6 +11,7 @@ import { GiHamburgerMenu } from "react-icons/gi"
 import Social from "./Social";
 
 import { useContractContext } from "../../providers/ContractProvider";
+import { config } from "../../config";
 // import { useWallet } from "@solana/wallet-adapter-react";
 // import { PROGRAM_ID, NETWORK } from "../../contracts/constants";
 
@@ -129,7 +130,7 @@ export default function Header({onMenu, setOnMenu}) {
                 <div onClick={() => {
                   setOnMenu(false)
                 }}>
-                  <a href={`https://solscan.io/account/${PROGRAM_ID}`} target="_blank" className="tab">
+                  <a href={config.scanLink} target="_blank" className="tab">
                     Contract
                   </a>
                 </div>
@@ -206,7 +207,7 @@ export default function Header({onMenu, setOnMenu}) {
         }
         <Divider />
         <Item>
-          <a href={`https://solscan.io/account/${PROGRAM_ID}`} target="_blank" className="tab">
+          <a href={config.scanLink} target="_blank" className="tab">
             Contract
           </a>
         </Item>

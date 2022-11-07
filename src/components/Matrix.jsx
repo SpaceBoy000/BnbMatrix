@@ -30,7 +30,7 @@ const Wrapper = styled("div")(({ theme }) => ({
   },
 }));
 
-export default function Matrix({ index, data, onClaim, onCompound }) {
+export default function Matrix({ index, data, actionStep, onClaim, onCompound }) {
   // console.log("Matrix ", index, " : ", data);
   const { fromWei } = useContractContext();
   const [compoundStr, setCompoundStr] = useState("Compound");
@@ -39,10 +39,10 @@ export default function Matrix({ index, data, onClaim, onCompound }) {
       setCompoundStr(getCompoundStr());
     }, 1000);
     return () => clearInterval(interval);
-  }, [data])
+  }, [data, actionStep])
 
   const getCompoundStr = () => {
-    let time = (Number(data.lastAction) + 86400) - Date.now() / 1000;
+    let time = (Number(data.lastAction) + Number(actionStep) + 133) - Date.now() / 1000;
     let h = Math.floor(time / 3600);
     let m = Math.floor((time - 3600 * h) / 60);
     let s = Math.floor(time - 3600 * h - 60 * m);
@@ -78,7 +78,7 @@ export default function Matrix({ index, data, onClaim, onCompound }) {
       </div>
       <div style={{display:'flex', justifyContent:'space-between', margin:'10px 0px'}}>
         <Typography variant='body2'>ROI</Typography>
-        <Typography variant='body3'>{ 0 } %</Typography>
+        <Typography variant='body3'>{ data.cmps == 65 ? 200 : (95 * Math.pow(1.0115, data.cmps)).toFixed(2) } %</Typography>
       </div>
       <div style={{display:'flex', justifyContent:'space-around', marginTop: '15px' }}>
         <button className="myButton1 myButton" style={{backgroundColor: 'black'}} onClick = {() => onCompound(index)}>{

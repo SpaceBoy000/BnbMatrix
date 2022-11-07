@@ -2,10 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { styled } from "@mui/system";
 import "./style.css"
 import { shorten } from "../../Home/components/Connect";
-
-import { useContractContext } from "../../providers/ContractProvider";
-
-// import { getLastWinner, getLastDepositUser } from "../../contracts/instructions";
+import { useContractContext } from '../../providers/ContractProvider';
 
 import { copyfunc } from '../../Home';
 
@@ -25,14 +22,14 @@ const Pool = () => {
   let element = document.getElementById('description');
   element.content = "Enter The Matrix..."
 
-  const {
-    settingsData,
-    userMatrixList,
-    userData,
-    walletSolBalance,
-    contractSolBalance,
-    refreshData,
-  } = useContractContext();
+  const [lastDepositTime, setLastDepositTime] = useState(0);
+  const [lastWinner, setLastWinner] = useState('0x0000000000000000000000000000000000000000');
+  const [poolPrizeSize, setPoolPrizeSite] = useState(0);
+  const [curWinner, setCurWinner] = useState('0x0000000000000000000000000000000000000000');
+  const [lastPoolPrizeSize, setLastPoolPrizeSite] = useState(0);
+  const [cutoffStep, setCutoffStep] = useState(0);
+
+  const { contract, fromWei } = useContractContext();
 
   let isMobile = window.matchMedia("only screen and (max-width: 900px)").matches;
 
@@ -84,11 +81,11 @@ const Pool = () => {
   useEffect(() => {
     const interval = setInterval(() => {
         try {
-            let seconds = settingsData?.account?.lastDepositTime.toNumber();
-            let limit = settingsData?.account.poolPrizeLimit.toNumber();
-            const data = getCountdown(seconds + limit)
-            console.log("settingsData?.account.members.toNumber() =", settingsData?.account.members.toNumber());
-            if (!settingsData || settingsData?.account.members.toNumber() == 0) data.total = 1;
+          
+            let seconds = lastDepositTime;
+            const data = getCountdown(Number(seconds) + Number(cutoffStep))
+            // console.log("lastDepositTime: ", lastDepositTime, " : ", cutoffStep, " : ", data);
+            // if (!settingsData || settingsData?.account.members.toNumber() == 0) data.total = 1;
             setCountdown({
                 alive: data.total > 0,
                 days: data.days,
@@ -102,7 +99,65 @@ const Pool = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [settingsData])
+  }, [lastDepositTime, cutoffStep])
+
+  useEffect(() => {
+    const fetchContractInfo = async () => {
+      try {
+        const [lastDepositTime, lastWinner, poolPrizeSize, curWinner, lastpoolPrizeSize, cutoffStep] = await Promise.all([
+          contract.methods.LATEST_DEPOSIT_TIME()
+            .call()
+            .catch((err) => {
+              console.log(err);
+              return 0;
+            }),
+          contract.methods.LAST_WINNER()
+            .call()
+            .catch((err) => {
+              console.log(err);
+              return 0;
+            }),
+          contract.methods.POOL_PRIZE_SIZE()
+            .call()
+            .catch((err) => {
+              console.log(err);
+              return 0;
+            }),
+          contract.methods.CUR_WINNER()
+            .call()
+            .catch((err) => {
+              console.log(err);
+              return 0;
+            }),
+          contract.methods.LAST_POOL_PRIZE_SIZE()
+            .call()
+            .catch((err) => {
+              console.log(err);
+              return 0;
+            }),
+          contract.methods.CUTOFF_STEP()
+            .call()
+            .catch((err) => {
+              console.log(err);
+              return 0;
+            }),
+        ]);
+
+        setLastDepositTime(lastDepositTime);
+        setLastWinner(lastWinner);
+        setPoolPrizeSite(fromWei(poolPrizeSize));
+        setCurWinner(curWinner);
+        setLastPoolPrizeSite(fromWei(lastpoolPrizeSize));
+        setCutoffStep(cutoffStep);
+        console.log("poolPrizeSize: ", poolPrizeSize);
+        console.log("cutoffStep: ", cutoffStep);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    console.log("Pool page");
+    fetchContractInfo();
+  }, [contract]);
 
     return (
         <Wrapper>
@@ -113,31 +168,31 @@ const Pool = () => {
             { countdown.alive && <>{ `${countdown.hours.toString().padStart(2, '0')} : ${countdown.minutes.toString().padStart(2, '0')} : ${countdown.seconds.toString().padStart(2, '0')}`}</>}
           </div>
           <div style={{fontSize: isMobile ? '40px' : '60px', color: isMobile ? 'white': '#14F195', padding:'30px'}}>
-          { settingsData ? Number(contractSolBalance * settingsData.account.poolPrizeRatio / 10000).toFixed(4) : 0 } BNB
+          { poolPrizeSize } BNB
 
           </div>
           <div>
             Last Deposit Address
           </div>
-          {/* <div style={{color:'black', fontWeight:'bolder', padding:'5px', cursor:'pointer'}} onClick={() => {copyfunc(getLastDepositUser(settingsData))}}>
-            { isMobile ? shorten(getLastDepositUser(settingsData)) : getLastDepositUser(settingsData) }
-          </div> */}
+          <div style={{color:'black', fontWeight:'bolder', padding:'5px', cursor:'pointer'}} onClick={() => {copyfunc(curWinner)}}>
+            { isMobile ? shorten(curWinner) : curWinner }
+          </div>
           <div>
             {!countdown.alive?<span style={{color: 'green'}}> Won Prize! </span>:""}
           </div>
           <div style={{margin:'20px'}}>
-            If there are no investment of at least 1 Solana within 24 hours after you, then the entire amount of 
+            If there are no investment of at least 0.1 BNB within 24 hours after you, then the entire amount of 
             Prize Pool will automatically be credited to your wallet via the smart contract.
           </div>
           <div style={{padding:'10px'}}>
-            The Pool Prize corresponds to {Number(settingsData?.account?.poolPrizeRatio / 100 ?? 0).toFixed(0)}% of all new deposits.
-          </div>.
-          {/* <div onClick={() => {copyfunc(getLastWinner(settingsData).winner)}}>
-            Last Winner: { isMobile ? shorten(getLastWinner(settingsData).winner) : getLastWinner(settingsData).winner }
-          </div> */}
-          {/* <div>
-            Last Prize: {getLastWinner(settingsData).prize}
-          </div> */}
+            The Pool Prize corresponds to 10% of all new deposits.
+          </div>
+          <div onClick={() => {copyfunc(lastWinner)}}>
+            Last Winner: { isMobile ? shorten(lastWinner) : lastWinner }
+          </div>
+          <div>
+            Last Prize: {Number(lastPoolPrizeSize).toFixed(3)} BNB
+          </div>
         </Wrapper>
     );
 }

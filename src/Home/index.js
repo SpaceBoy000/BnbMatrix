@@ -50,6 +50,9 @@ export default function Home() {
   const [memberCount, setMemberCount] = useState(0);
   const [walletBalance, setWalletBalance] = useState(0);
   const [userMatrixList, setUserMatrixList] = useState([]);
+  const [actionStep, setActionStep] = useState(0);
+  const [refCount, setRefCount] = useState(0);
+  const [refBonus, setRefBonus] = useState(0);
   const [refLink, setRefLink] = useState('Copy Referral Link');
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -107,6 +110,9 @@ export default function Home() {
         setWalletBalance(0);
         setUserMatrixList([]);
         setMemberCount(0);
+        setActionStep(0);
+        setRefBonus(0);
+        setRefCount(0);
         // setCompoundTimes(0);
         // setInitialDeposit(0);
         // setTotalDeposit(0);
@@ -117,7 +123,7 @@ export default function Home() {
       }
       
       try {
-        const [walletBalance, userMatrixList, memberCount/*mainKey, usersKey, currentRewards*/] = await Promise.all([
+        const [walletBalance, userMatrixList, memberCount, actionStep, userInfo/*mainKey, usersKey, currentRewards*/] = await Promise.all([
           getBnbBalance(address),
           // contract.methods.MainKey(1)
           //   .call()
@@ -132,6 +138,18 @@ export default function Home() {
             return;
           }),
           contract.methods.MEMBER_COUNT()
+            .call()
+            .catch((err) => {
+            console.error('user info error: ', err);
+            return;
+          }),
+          contract.methods.ACTION_STEP()
+            .call()
+            .catch((err) => {
+            console.error('user info error: ', err);
+            return;
+          }),
+          contract.methods.users(address)
             .call()
             .catch((err) => {
             console.error('user info error: ', err);
@@ -153,8 +171,11 @@ export default function Home() {
         setWalletBalance(fromWei(walletBalance));
         console.log("Wallet Balance: ", fromWei(walletBalance));
         setUserMatrixList(userMatrixList);
-        console.log("UserInfo: ", userMatrixList);
         setMemberCount(memberCount);
+        setActionStep(actionStep);
+        setRefBonus(fromWei(userInfo.refBonus));
+        setRefCount(userInfo.referralsCount);
+        
         // setUserCount(mainKey.users);
         // setTotalDeposit(fromWei(mainKey.ovrTotalDeps));
         // console.log('usersKey=> ', usersKey);
@@ -169,7 +190,9 @@ export default function Home() {
         setWalletBalance(0);
         setMemberCount(0);
         setUserMatrixList([]);
-        
+        setActionStep(0);
+        setRefBonus(0);
+        setRefCount(0);
         // setInitialDeposit(0);
         // setTotalDeposit(0);
         // setTotalClaimed(0);
@@ -182,7 +205,7 @@ export default function Home() {
       fetchContractBNBBalance();
       console.log("Home fetchContractBNBBalance");
 
-    }, [web3, chainId]);
+    }, [web3, chainId, address]);
   
     useEffect(() => {
       fetchWalletBalance();
@@ -213,36 +236,37 @@ export default function Home() {
     }, [])
 
 
-  // useEffect(() => {
-  //   const refData = async () => {
-  //     if (wallet.publicKey) {
-  //       const refLink = `${window.origin}/miner?ref=${wallet.publicKey.toBase58()}`;
-  //       setRefLink(refLink);
-  //     } else {
-  //       setRefLink('Copy Referral Link');
-  //     }
-  //   };
+  useEffect(() => {
+    const refData = async () => {
+      if (address) {
+        const refLink = `${window.origin}/miner?ref=${address}`;
+        setRefLink(refLink);
+        console.log(address, " : ", refLink);
+      } else {
+        setRefLink('Copy Referral Link');
+      }
+    };
 
-  //   refData();
-  // }, [wallet.publicKey]);
+    refData();
+  }, [address]);
 
   const onInvest = async () => {
     setLoading(true);
     try {
       let ref = getRef();
-      console.log("Ref = ", ref);
-      console.log("Invest Amount = ", toWei(amount));
-      await contract.methods.Deposit(ref).send({from: address, value:toWei(amount)});
-      fetchWalletBalance();
-      fetchContractBNBBalance();
+      await contract.methods.Invest(ref).send({from: address, value:toWei(amount)});
+      refreshData();
+      // fetchWalletBalance();
+      // fetchContractBNBBalance();
     } catch (err) {
       console.error(err);
     }
     setLoading(false);
-    refreshData();
   }
 
   const refreshData = () => {
+    fetchWalletBalance();
+    fetchContractBNBBalance();
     return true;
   }
 
@@ -252,11 +276,11 @@ export default function Home() {
 
     try {
       await contract.methods.Compound(matrixId).send({from: address});
+      refreshData();
     } catch (err) {
       console.error(err);
     }
     setLoading(false);
-    refreshData();
   }
 
   const onClaim = async (matrixId) => {
@@ -264,11 +288,11 @@ export default function Home() {
     setLoading(true);
     try {
       await contract.methods.Withdraw(matrixId).send({from: address});
+      refreshData();
     } catch (err) {
       console.error(err);
     }
     setLoading(false);
-    refreshData();
   }
 
   const isStarted = () => {
@@ -317,7 +341,7 @@ export default function Home() {
         {
           userMatrixList.map((matrix, i) => (
               <>
-                <Matrix data = {matrix} index = {i} onCompound={onCompound} onClaim={onClaim}/>
+                <Matrix data = {matrix} index = {i} actionStep = {actionStep} onCompound={onCompound} onClaim={onClaim}/>
                 { i == 0 ? 
                   <Divider style={{height: isMobile ? '2px' : '180px', width: isMobile ? '100' : '2px', background:'#559DC9', margin:'10px', alignSelf:'center'}}/>
                   : <></>
@@ -357,11 +381,11 @@ export default function Home() {
           </div>
           <div className="ref_item">
             <span>Members Referred</span>
-            <span className="nn">{0} Members</span>
+            <span className="nn">{refCount} Members</span>
           </div>
           <div className="ref_item">
             <span>Referral Rewards</span>
-            {/* <span className="nn">{toUiSolAmount(userData?.account.referralReward?.toNumber() ?? 0 )} BNB</span> */}
+            <span className="nn">{refBonus} BNB</span>
           </div>
           <button className="refBtn2" style={{border:'none', fontFamily: 'lightPolice',background:'black', color:'white', width:'100%', padding:'5px'}} onClick={ () => {copyfunc(refLink)} }>Click to Copy</button>
         </div>
