@@ -187,11 +187,11 @@ const Pool = () => {
           <div style={{padding:'10px'}}>
             The Pool Prize corresponds to 10% of all new deposits.
           </div>
-          <div onClick={() => {copyfunc(lastWinner)}}>
-            Last Winner: { isMobile ? shorten(lastWinner) : lastWinner }
+          <div style={{cursor:'pointer'}} onClick={() => {copyfunc(lastWinner)}}>
+            Last Winner: <span style={{color:'black'}}>{ isMobile ? shorten(lastWinner) : lastWinner }</span>
           </div>
           <div>
-            Last Prize: {Number(lastPoolPrizeSize).toFixed(3)} BNB
+            Last Prize: <span style={{color:'black'}}>{Number(lastPoolPrizeSize).toFixed(3)} BNB</span>
           </div>
         </Wrapper>
     );
