@@ -167,7 +167,7 @@ const Pool = () => {
           <div style={{color: 'black', fontSize:'30px', fontWeight: 'bolder'}}>
             { countdown.alive && <>{ `${countdown.hours.toString().padStart(2, '0')} : ${countdown.minutes.toString().padStart(2, '0')} : ${countdown.seconds.toString().padStart(2, '0')}`}</>}
           </div>
-          <div style={{fontSize: isMobile ? '40px' : '60px', color: isMobile ? 'white': '#14F195', padding:'30px'}}>
+          <div style={{fontSize: isMobile ? '40px' : '60px', color: isMobile ? '#11B470': '#11B470', padding:'30px'}}>
           { poolPrizeSize } BNB
 
           </div>

@@ -325,7 +325,7 @@ export default function Home() {
       pauseOnHover
     /> */}
     <Wrapper>
-      <MiningTimer/>
+      {/* <MiningTimer/> */}
       <div className='contractInfo'>
         <div className="contractInfoItem">
           <span className="tt">Total Value Locked</span>
@@ -352,7 +352,7 @@ export default function Home() {
               <>
                 <Matrix data = {matrix} index = {i} actionStep = {actionStep} onCompound={onCompound} onClaim={onClaim}/>
                 { i == 0 ? 
-                  <Divider style={{height: isMobile ? '2px' : '180px', width: isMobile ? '100' : '2px', background:'#559DC9', margin:'10px', alignSelf:'center'}}/>
+                  <Divider style={{height: isMobile ? '2px' : '180px', width: isMobile ? '100' : '2px', background:'#ECB71A', margin:'10px', alignSelf:'center'}}/>
                   : <></>
                 }
               </>
@@ -372,7 +372,7 @@ export default function Home() {
                 className='nn'
                 style={{width: '120px', marginRight:'20px', padding:'5px 10px', border:'none'}}
               />
-              <button className="myButton_invest" onClick={onInvest}>Invest</button>
+              <button className="myButton_invest" style={{background: '#40454E'}} onClick={onInvest}>Invest</button>
             </div>
           </div> : <></>}
       </div>
@@ -382,7 +382,7 @@ export default function Home() {
           <h3 className="tt">Referral</h3>
           <button className="refBtn1" style={{border:'none', fontFamily: 'lightPolice', fontSize:'20px', background:'black', color:'white', width:'70%', marginTop:'30px', padding:'5px'}} onClick={ () => { copyfunc(refLink) } }>Click to Copy</button>
         </div>
-        <Divider style={{display: isMobile ? 'none' : 'block', height:'100px', width:'2px', background:'#559DC9', margin:'10px', alignSelf:'center'}}/>
+        <Divider style={{display: isMobile ? 'none' : 'block', height:'100px', width:'2px', background:'#ECB71A', margin:'10px', alignSelf:'center'}}/>
         <div className="ref_second tt">
           <div className="ref_item">
             <span>Referral Bonus</span>

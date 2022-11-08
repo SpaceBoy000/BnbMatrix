@@ -84,7 +84,7 @@ export default function Matrix({ index, data, actionStep, onClaim, onCompound })
         <button className="myButton1 myButton" style={{backgroundColor: 'black'}} onClick = {() => onCompound(index)}>{
           compoundStr
         }</button>
-        <button className="myButton1 myButton" style={{backgroundColor: '#14F195'}} onClick = {() => onClaim(index)}>Claim</button>
+        <button className="myButton1 myButton" style={{backgroundColor: '#11B470'}} onClick = {() => onClaim(index)}>Claim</button>
       </div>
     </Wrapper>
   );

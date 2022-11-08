@@ -137,7 +137,7 @@ export default function Header({onMenu, setOnMenu}) {
                 <div onClick={() => {
                   setOnMenu(false)
                 }}>
-                  <a href="https://sol-matrix.gitbook.io/solmatrix/" target="_blank" className="tab">
+                  <a href="https://sol-matrix.gitbook.io/bnbmatrix/" target="_blank" className="tab">
                     Docs
                   </a>
                 </div>
@@ -212,7 +212,7 @@ export default function Header({onMenu, setOnMenu}) {
           </a>
         </Item>
         <Item>
-          <a href="https://sol-matrix.gitbook.io/solmatrix/" target="_blank" className="tab">
+          <a href="https://sol-matrix.gitbook.io/bnbmatrix/" target="_blank" className="tab">
             Docs
           </a>
         </Item>
