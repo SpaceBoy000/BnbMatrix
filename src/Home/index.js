@@ -131,8 +131,8 @@ export default function Home() {
           //     console.error("userInfo error", err);
           //     return 0;
           //   }),
-          contract.methods.userInfo()
-            .call({from: address})
+          contract.methods.userInfo(address)
+            .call()
             .catch((err) => {
             console.error('user info error: ', err);
             return;

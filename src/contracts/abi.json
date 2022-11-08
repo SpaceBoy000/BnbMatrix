@@ -2,42 +2,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "Wallet",
-				"type": "address"
-			},
-			{
-				"internalType": "bool",
-				"name": "isBlacklisted",
-				"type": "bool"
-			}
-		],
-		"name": "blackListWallet",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address[]",
-				"name": "Wallet",
-				"type": "address[]"
-			},
-			{
-				"internalType": "bool",
-				"name": "isBlacklisted",
-				"type": "bool"
-			}
-		],
-		"name": "blackMultipleWallets",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "uint256",
 				"name": "_index",
 				"type": "uint256"
@@ -82,8 +46,14 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "renounceOwnership",
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -114,7 +84,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "startMatrix",
+		"name": "renounceOwnership",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -123,18 +93,23 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "newOwner",
+				"name": "_account",
 				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_value",
+				"type": "uint256"
 			}
 		],
-		"name": "transferOwnership",
+		"name": "setCustomReferralFee",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
 		"inputs": [],
-		"name": "withdraw",
+		"name": "startMatrix",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -147,57 +122,6 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "blacklistActive",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "Blacklisted",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "Wallet",
-				"type": "address"
-			}
-		],
-		"name": "checkIfBlacklisted",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "isBlacklisted",
-				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -224,6 +148,25 @@
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "customRefFee",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -303,6 +246,11 @@
 			{
 				"internalType": "uint256",
 				"name": "_totalRefBonus",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_totalMembers",
 				"type": "uint256"
 			}
 		],
@@ -467,6 +415,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "totalClaimed",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "totalCompound",
 		"outputs": [
 			{
@@ -480,7 +441,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "totalDeposits",
+		"name": "totalInvested",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -506,32 +467,6 @@
 	},
 	{
 		"inputs": [],
-		"name": "totalStaked",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalWithdrawn",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "UPDATE_POOL_LIMIT",
 		"outputs": [
 			{
@@ -544,7 +479,13 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_account",
+				"type": "address"
+			}
+		],
 		"name": "userInfo",
 		"outputs": [
 			{
@@ -596,11 +537,6 @@
 			{
 				"internalType": "uint256",
 				"name": "totalWiths",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "totalAccrued",
 				"type": "uint256"
 			},
 			{
