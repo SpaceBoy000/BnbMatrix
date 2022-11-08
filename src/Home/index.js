@@ -275,6 +275,15 @@ export default function Home() {
     setLoading(true);
 
     try {
+      console.log("matrix info: ", userMatrixList[matrixId].cmps);
+      if (userMatrixList[matrixId].cmps != 65) {
+        Toast.fire({
+          icon: 'error',
+          title: 'You could not compound, anymore!'
+        });
+        setLoading(false);
+        return;
+      }
       await contract.methods.Compound(matrixId).send({from: address});
       refreshData();
     } catch (err) {
@@ -287,7 +296,7 @@ export default function Home() {
     if (!isStarted()) return;
     setLoading(true);
     try {
-      await contract.methods.Withdraw(matrixId).send({from: address});
+      await contract.methods.Claim(matrixId).send({from: address});
       refreshData();
     } catch (err) {
       console.error(err);

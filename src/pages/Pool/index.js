@@ -55,7 +55,7 @@ const Pool = () => {
 
   const getCountdown = (deadline) => {
     const now = Date.now() / 1000;
-    const total = deadline - now + 133;
+    const total = deadline - now;
     if (total <= 0) return { 
       total: 0,
       days: 0,
