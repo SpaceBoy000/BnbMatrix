@@ -16,12 +16,13 @@ const ConnectButton = styled('button')(({ theme }) => ({
   paddingBottom: "0.25rem",
   fontSize: "1rem",
   lineHeight: "1.5rem",
-  textTransform: "uppercase",
+  // textTransform: "uppercase",
   letterSpacing: "0.05em",
   background: "#11B470",
   maxHeight: "40px",
   marginTop: "auto",
   marginBottom: "auto",
+  minWidth: '135px',
   // color: theme.typography.allVariants.color,
   color:"white",
   [theme.breakpoints.down("md")]: {
@@ -47,7 +48,7 @@ const SmallScreenConnectButton = styled(Button)(({ theme }) => ({
 
 export function shorten(str) {
   if (str.length < 10) return str;
-  return `${str.slice(0, 6)}...${str.slice(str.length - 4)}`;
+  return `${str.slice(0, 5)}..${str.slice(str.length - 3)}`;
 }
 
 export default function Connect({ responsive = true }) {

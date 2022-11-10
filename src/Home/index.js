@@ -276,7 +276,7 @@ export default function Home() {
 
     try {
       console.log("matrix info: ", userMatrixList[matrixId].cmps);
-      if (userMatrixList[matrixId].cmps != 65) {
+      if (userMatrixList[matrixId].cmps == 65) {
         Toast.fire({
           icon: 'error',
           title: 'You could not compound, anymore!'
@@ -352,7 +352,7 @@ export default function Home() {
               <>
                 <Matrix data = {matrix} index = {i} actionStep = {actionStep} onCompound={onCompound} onClaim={onClaim}/>
                 { i == 0 ? 
-                  <Divider style={{height: isMobile ? '2px' : '180px', width: isMobile ? '100' : '2px', background:'#ECB71A', margin:'10px', alignSelf:'center'}}/>
+                  <Divider style={{height: isMobile ? '2px' : '180px', width: isMobile ? '93%' : '2px', background:'#ECB71A', margin:'10px', alignSelf:'center'}}/>
                   : <></>
                 }
               </>
@@ -379,7 +379,7 @@ export default function Home() {
       <div style={{flex:'1'}}/>
       <div className="refInfo">
         <div className="ref_first">
-          <h3 className="tt">Referral</h3>
+          <h3 className="tt" style={{color:'white'}}>Referral</h3>
           <button className="refBtn1" style={{border:'none', fontFamily: 'lightPolice', fontSize:'20px', background:'black', color:'white', width:'70%', marginTop:'30px', padding:'5px'}} onClick={ () => { copyfunc(refLink) } }>Click to Copy</button>
         </div>
         <Divider style={{display: isMobile ? 'none' : 'block', height:'100px', width:'2px', background:'#ECB71A', margin:'10px', alignSelf:'center'}}/>

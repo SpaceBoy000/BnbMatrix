@@ -84,7 +84,7 @@ code {
 
 .menuBtn {
   display: none;
-  background-color: #14F195;
+  background-color: #11B470;
   font-family: lightPolice;
   width: 135px !important;
   font-size: 15px !important;
@@ -149,6 +149,7 @@ code {
   justify-content: space-between;
   margin: 10px 0px;
   font-size: 20px;
+  color: white;
 }
 
 .title {

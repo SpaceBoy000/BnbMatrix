@@ -12,6 +12,7 @@ const Wrapper = styled("div")(({ theme }) => ({
     background: "linear-gradient(90deg, #fedd58 15%, #eec433 84%, #e0ae13 100%)",
     fontSize:'20px',
     height: '100%',
+    fontFamily: 'mediumPolice',
     [theme.breakpoints.down("md")]: {
         // height:'100vh'
     },
@@ -167,14 +168,14 @@ const Pool = () => {
           <div style={{color: 'black', fontSize:'30px', fontWeight: 'bolder'}}>
             { countdown.alive && <>{ `${countdown.hours.toString().padStart(2, '0')} : ${countdown.minutes.toString().padStart(2, '0')} : ${countdown.seconds.toString().padStart(2, '0')}`}</>}
           </div>
-          <div style={{fontSize: isMobile ? '40px' : '60px', color: isMobile ? '#11B470': '#11B470', padding:'30px'}}>
-          { poolPrizeSize } BNB
+          <div style={{fontSize: isMobile ? '40px' : '60px', color: '#11B470', padding:'30px'}}>
+            <span className='nn'>{ poolPrizeSize }</span> BNB
 
           </div>
           <div>
             Last Deposit Address
           </div>
-          <div style={{color:'black', fontWeight:'bolder', padding:'5px', cursor:'pointer'}} onClick={() => {copyfunc(curWinner)}}>
+          <div className='nn' style={{color:'black', fontWeight:'bolder', padding:'5px', cursor:'pointer'}} onClick={() => {copyfunc(curWinner)}}>
             { isMobile ? shorten(curWinner) : curWinner }
           </div>
           <div>
@@ -188,10 +189,11 @@ const Pool = () => {
             The Pool Prize corresponds to 10% of all new deposits.
           </div>
           <div style={{cursor:'pointer'}} onClick={() => {copyfunc(lastWinner)}}>
-            Last Winner: <span style={{color:'black'}}>{ isMobile ? shorten(lastWinner) : lastWinner }</span>
+            Last Winner: <span className='nn' style={{color:'black'}}>{ isMobile ? shorten(lastWinner) : lastWinner }</span>
           </div>
           <div>
-            Last Prize: <span style={{color:'black'}}>{Number(lastPoolPrizeSize).toFixed(3)} BNB</span>
+            Last Prize: <span className='nn' style={{color:'black'}}>{Number(lastPoolPrizeSize).toFixed(3)} </span>
+            <span style={{color:'black'}}>BNB</span>
           </div>
         </Wrapper>
     );

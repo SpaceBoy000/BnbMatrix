@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import Web3 from "web3";
 
 import abi from "../contracts/abi.json";
+import tokenAbi from "../contracts/tokenAbi.json";
 import { useAuthContext } from "./AuthProvider";
 import { config } from "../config";
 

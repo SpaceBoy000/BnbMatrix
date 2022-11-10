@@ -12,8 +12,6 @@ import Social from "./Social";
 
 import { useContractContext } from "../../providers/ContractProvider";
 import { config } from "../../config";
-// import { useWallet } from "@solana/wallet-adapter-react";
-// import { PROGRAM_ID, NETWORK } from "../../contracts/constants";
 
 const Wrapper = styled("div")(({ theme }) => ({
   color: 'white',
@@ -48,10 +46,6 @@ export default function Header({onMenu, setOnMenu}) {
 
   const [url, setUrl] = useState('');
   const location = useLocation();
-
-  useEffect(() => {
-    console.log("locationxxxxxxxxxxxxxxxxx: ", location.pathname);
-  }, [location]);
 
   return (
     <Wrapper>
