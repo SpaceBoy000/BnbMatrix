@@ -12,7 +12,7 @@
 
 .tt {
   font-family: mediumPolice;
-  color: black;
+  color: white;
 }
 
 .nn {
@@ -95,12 +95,12 @@ code {
 }
 
 .contractInfo {
-  background: linear-gradient(90deg, #FFDE59 15%, #E0AE13 100%);
+  /* background: linear-gradient(90deg, #FFDE59 15%, #E0AE13 100%); */
   margin: 20px 0;
   display: flex;
   padding: 10px 20px;
   justify-content: space-between;
-  font-size: 25px;
+  font-size: 20px;
 }
 
 .contractInfoItem {
@@ -108,6 +108,33 @@ code {
   flex-direction: column;
   color: white;
   text-align: center;
+  background: linear-gradient(90deg, #000 15%, #282828 100%);
+  border-radius: 1rem;
+  border: solid 2px #494949;
+  padding: 1rem;
+}
+
+.tradeCard {
+  display: flex;
+  flex-direction: column;
+  color: white;
+  text-align: center;
+  background: linear-gradient(90deg, #000 15%, #282828 100%);
+  border-radius: 1rem;
+  border: solid 2px #494949;
+  padding: 1rem;
+  width: 100%;
+  text-align: left;
+}
+
+.blueCover {
+  background: linear-gradient(90deg, #003579 15%, #409ba0 100%) !important;
+  border-color: #334cac !important;
+}
+
+.blueCover2 {
+  background: linear-gradient(90deg, #409ba0 15%, #003579 100%) !important;
+  border-color: #334cac !important;
 }
 
 .investCard {

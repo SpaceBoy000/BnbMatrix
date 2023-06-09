@@ -61,28 +61,28 @@ export default function Header({onMenu, setOnMenu}) {
                   setOnMenu(false)
                 }}>
                   <Link
-                    to="/miner"
+                    to="/dashboard"
                     className="tab"
                     style={{
-                      color: location.pathname.includes('miner') ? '#fedd58' : 'white',
+                      color: location.pathname.includes('dashboard') ? '#3574b9' : 'white',
                       textDecoration: 'none',
                     }}
                   >
-                    Miner
+                    Dashboard
                   </Link>
                 </div>
                 <div onClick={() => {
                   setOnMenu(false)
                 }}>
                   <Link
-                    to="/pool"
+                    to="/matrices"
                     className="tab"
                     style={{
-                      color: location.pathname.includes('pool') ? '#fedd58' : 'white',
+                      color: location.pathname.includes('matrices') ? '#3574b9' : 'white',
                       textDecoration: 'none',
                     }}
                   >
-                    Pool Prize
+                    Matrices
                   </Link>
                 </div>
                 {/* <div onClick={() => {
@@ -92,7 +92,7 @@ export default function Header({onMenu, setOnMenu}) {
                       to="/nft"
                       className="tab"
                       style={{
-                        color: location.pathname.includes('nft') ? '#fedd58' : 'white',
+                        color: location.pathname.includes('nft') ? '#3574b9' : 'white',
                         textDecoration: 'none',
                       }}
                     >
@@ -109,7 +109,7 @@ export default function Header({onMenu, setOnMenu}) {
                   //     to="/admin"
                   //     className="tab"
                   //     style={{
-                  //       color: location.pathname.includes('admin') ? '#fedd58' : 'white',
+                  //       color: location.pathname.includes('admin') ? '#3574b9' : 'white',
                   //       textDecoration: 'none',
                   //     }}
                   //   >
@@ -131,15 +131,22 @@ export default function Header({onMenu, setOnMenu}) {
                 <div onClick={() => {
                   setOnMenu(false)
                 }}>
-                  <a href="https://sol-matrix.gitbook.io/bnbmatrix/" target="_blank" className="tab">
+                  <a href="/" target="_blank" className="tab">
                     Docs
                   </a>
                 </div>
                 <div onClick={() => {
                   setOnMenu(false)
                 }}>
-                  <a href="/audit.pdf" target="_blank" className="tab">
+                  <a href="/" target="_blank" className="tab">
                     Audit
+                  </a>
+                </div>
+                <div onClick={() => {
+                  setOnMenu(false)
+                }}>
+                  <a href="/" target="_blank" className="tab">
+                    KYC
                   </a>
                 </div>
               </div>
@@ -162,25 +169,25 @@ export default function Header({onMenu, setOnMenu}) {
           <Link
             to="/"
             className='tab'
-            style={{color: location.pathname.includes('miner') ? '#fedd58' : 'white'}}
+            style={{color: location.pathname.includes('dashboard') ? '#3574b9' : 'white'}}
           >
-              Miner
+              Dashboard
           </Link>
         </Item>
         <Item>
           <Link
-            to="pool"
+            to="matrices"
             className='tab'
-            style={{color: location.pathname.includes('pool') ? '#fedd58' : 'white'}}
+            style={{color: location.pathname.includes('matrices') ? '#3574b9' : 'white'}}
           >
-              Pool Prize
+              Matrices
           </Link>
         </Item>
         {/* <Item>
           <Link
             to="/nft"
             className='tab'
-            style={{color: location.pathname.includes('nft') ? '#fedd58' : 'white'}}
+            style={{color: location.pathname.includes('nft') ? '#3574b9' : 'white'}}
           >
               NFT
           </Link>
@@ -192,7 +199,7 @@ export default function Header({onMenu, setOnMenu}) {
             //   <Link
             //     to="/admin"
             //     className='tab'
-            //     style={{color: location.pathname.includes('admin') ? '#fedd58' : 'white'}}
+            //     style={{color: location.pathname.includes('admin') ? '#3574b9' : 'white'}}
             //   >
             //       Admin
             //   </Link>
@@ -206,13 +213,18 @@ export default function Header({onMenu, setOnMenu}) {
           </a>
         </Item>
         <Item>
-          <a href="https://sol-matrix.gitbook.io/bnbmatrix/" target="_blank" className="tab">
+          <a href="/" target="_blank" className="tab">
             Docs
           </a>
         </Item>
         <Item>
-            <a href="/audit.pdf" target="_blank" className="tab">
+            <a href="/" target="_blank" className="tab">
               Audit
+            </a>
+        </Item>
+        <Item>
+            <a href="/" target="_blank" className="tab">
+              KYC
             </a>
         </Item>
       </div>

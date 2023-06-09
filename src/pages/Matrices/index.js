@@ -18,7 +18,7 @@ const Wrapper = styled("div")(({ theme }) => ({
     },
 }));
 
-const Pool = () => {
+const Matrices = () => {
 
   let element = document.getElementById('description');
   element.content = "Enter The Matrix..."
@@ -199,4 +199,4 @@ const Pool = () => {
     );
 }
 
-export default Pool;
+export default Matrices;
