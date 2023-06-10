@@ -151,7 +151,7 @@ export default function Header({onMenu, setOnMenu}) {
                 </div>
               </div>
               <div style={{flex:1}}></div>
-              <Social/>
+              {/* <Social/> */}
             </div>
             <div
               className="empty_mobile"
@@ -229,7 +229,7 @@ export default function Header({onMenu, setOnMenu}) {
         </Item>
       </div>
       <div style={{flex: 1}}/>
-      <Social/>
+      {/* <Social/> */}
     </Wrapper>
   );
 }

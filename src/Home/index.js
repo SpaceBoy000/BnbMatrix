@@ -1,5 +1,6 @@
 import { styled } from "@mui/system";
 import { Typography } from "@mui/material";
+import Slider from '@mui/material/Slider';
 import LinearProgress from "@mui/material/LinearProgress";
 import { useLocation } from "react-router-dom";
 import Divider from "@mui/material/Divider";
@@ -59,6 +60,11 @@ export default function Home() {
     const [refLink, setRefLink] = useState('Copy Referral Link');
     const [amount, setAmount] = useState(0);
     const [loading, setLoading] = useState(false);
+
+    const [sliderValue, setSliderValue] = useState('50');
+    const calculate = (v) => {
+        setSliderValue(v);
+    }
 
     let contractInfos = [
         { label: 'Total Investments', value: 0, unit: 'USDC' },
@@ -403,8 +409,17 @@ export default function Home() {
                                 <div className='tt bg-white text-black rounded-lg px-2'>0.00 USDC</div>
                             </div>
                         </div>
-                        <div className="text-center">
+                        <div className="text-center items-center self-center">
                             Period 4 weeks
+                            <div className="text-center">
+                                <Slider
+                                    defaultValue={50}
+                                    aria-label="Default"
+                                    valueLabelDisplay="auto"
+                                    color='primary'
+                                    className="m-w-[200px]"
+                                    onChange={(_, v) => calculate(v)} />
+                            </div>
                         </div>
                         <div className="flex gap-4">
                             <div className="gap-6">
