@@ -1,6 +1,8 @@
 import { styled } from "@mui/system";
 import { Typography } from "@mui/material";
 import Slider from '@mui/material/Slider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import { MuiThemeProvider } from 'material-ui';
 import LinearProgress from "@mui/material/LinearProgress";
 import { useLocation } from "react-router-dom";
 import Divider from "@mui/material/Divider";
@@ -21,6 +23,13 @@ import MiningTimer from "./components/MiningTimer.js";
 import { extractEventHandlers } from "@mui/base";
 import { NoBackpackSharp } from "@mui/icons-material";
 import telegramIcon from "../assets/telegram.png";
+
+const muiTheme = getMuiTheme({
+    Slider: {
+        trackColor: "yellow",
+        selectionColor: "green"
+    }
+});
 
 const Wrapper = styled("div")(({ theme }) => ({
     height: '100%',
@@ -68,9 +77,9 @@ export default function Home() {
 
     let contractInfos = [
         { label: 'Total Investments', value: 0, unit: 'USDC' },
-        { label: 'Total Value locked', value: 0, unit: 'USDC' },
+        { label: 'Total Value Locked', value: 0, unit: 'USDC' },
         { label: 'Weekly ROI', value: 0, unit: "%" },
-        { label: 'Organization', value: 0, unit: "MEmbers" },
+        { label: 'Organization', value: 0, unit: "Members" },
     ]
 
     let profitData = [
@@ -363,8 +372,8 @@ export default function Home() {
                         contractInfos.map((item, index) => {
                             return (
                                 <div className="contractInfoItem" key={index}>
-                                    <span className="tt">{item.label}</span>
-                                    <span className='nn'>{item.value + " " + item.unit} </span>
+                                    <span className="rr">{item.label}</span>
+                                    <span className='tt font-bold pt-2'>{item.value + " " + item.unit} </span>
                                 </div>
                             );
                         })
@@ -372,80 +381,81 @@ export default function Home() {
                 </div>
                 <div style={{ flex: '1' }} />
 
-                <div className='flex gap-4'>
+                <div className='flex flex-col md:flex-row gap-4'>
                     <div className='tradeCard'>
                         <span className='tt text-xl pb-2'>Trading Revenue</span>
-                        <span className='tt'>Trading Bots</span>
+                        <span className='nn text-sm'>Trading Bots</span>
                         <div className="flex gap-6">
                             <div className='tt'>+1234 USDC</div>
-                            <div className='tt'>10.00%</div>
+                            <div className='tt !text-[#11af6d]'>10.00%</div>
                         </div>
-                        <span className='tt'>Trading Bots</span>
+                        <span className='nn text-sm'>Trading Bots</span>
                         <div className="flex gap-6">
                             <div className='tt'>-1234 USDC</div>
-                            <div className='tt'>10.00%</div>
+                            <div className='tt !text-[#ff3131]'>10.00%</div>
                         </div>
                     </div>
                     <div className='tradeCard'>
                         <div className='tt text-xl pb-2'>Track Our Trades</div>
                         <div className="flex gap-2 items-center">
                             <div>Our trading strategies allow USDC Matrix to generate external revenure. Join the Telegram Channel</div>
-                            <img src={telegramIcon} width="64px" height="64px" alt="telegramIcon" />
+                            <a href="https://t.me/" target="_blank" alt="telegram link" className="w-[150px] hover:-translate-y-0.5"><img src={telegramIcon} width="64px" height="64px" alt="telegramIcon"/></a>
                         </div>
                     </div>
                 </div>
                 
-                <div className='flex gap-4 my-2'>
+                <div className='flex flex-col md:flex-row gap-4 my-2'>
                     <div className='tradeCard gap-2'>
                         <span className='tt text-xl pb-2'>Calculator</span>
                         <div className="flex gap-4">
                             <div className="gap-6 w-full">
-                                <div className='tt'>Staked Amount</div>
-                                <div className='tt bg-white text-black rounded-lg px-2'>0.00 USDC</div>
+                                <div className='nn text-sm pb-2'>Staked Amount</div>
+                                <div className='tt bg-white text-black rounded-lg px-2 py-1'>0.00 USDC</div>
                             </div>
                             
                             <div className="gap-6 w-full">
-                                <div className='tt'>Weekly %</div>
-                                <div className='tt bg-white text-black rounded-lg px-2'>0.00 USDC</div>
+                                <div className='nn text-sm pb-2'>Weekly %</div>
+                                <div className='tt bg-white text-black rounded-lg px-2 py-1'>7.00 %</div>
                             </div>
                         </div>
-                        <div className="text-center items-center self-center">
-                            Period 4 weeks
+                        <div className="text-center items-center self-center w-2/3">
+                            <div className='nn text-sm pt-3'>Period 4 weeks</div>
                             <div className="text-center">
+                                <MuiThemeProvider muiTheme={muiTheme}>
                                 <Slider
                                     defaultValue={50}
                                     aria-label="Default"
                                     valueLabelDisplay="auto"
-                                    color='primary'
-                                    className="m-w-[200px]"
+                                    className="m-w-[200px] !text-[#4e6cf2]"
                                     onChange={(_, v) => calculate(v)} />
+                                </MuiThemeProvider>
                             </div>
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex flex-row gap-4 py-2 justify-center">
                             <div className="gap-6">
-                                <div className='tt'>Total Profit</div>
+                                <div className='nn text-sm'>Total Profit</div>
                                 <div className='tt'>12,345 USDC</div>
                             </div>
                             
                             <div className="gap-6">
-                                <div className='tt'>Weekly Profit</div>
-                                <div className='tt'>1234 USDC</div>
+                                <div className='nn text-sm'>Weekly Profit</div>
+                                <div className='tt'>7 %</div>
                             </div>
                         </div>
                     </div>
-                    <div className='tradeCard blueCover'>
-                        <div className='tt text-xl pb-2'>Profits Distributed</div>
-                        <div className="flex gap-2 items-center justify-left">
-                            <div className="min-w-[40%]">Total Profits</div>
-                            <div className="min-w-[40%]">Weekly Profits</div>
-                            <div>ROI</div>
+                    <div className='tradeCard blueCover2 text-center'>
+                        <div className='tt text-xl pb-3 text-left'>Profits Distributed</div>
+                        <div className="flex items-center justify-left pb-2">
+                            <div className="nn text-sm min-w-[35%]">Total Profits</div>
+                            <div className="nn text-sm min-w-[35%]">Weekly Profits</div>
+                            <div className="nn text-sm min-w-[30%]">ROI</div>
                         </div>
                         {profitData.map((item, index) => {
                             return (
-                                <div className="flex gap-2 items-center justify-left" key={index}>
-                                    <div className="min-w-[40%]">{item.totalProfit} USDC</div>
-                                    <div className="min-w-[40%]">{item.weeklyProfit} USDC</div>
-                                    <div>{item.roi} %</div>
+                                <div className="flex items-center justify-left pb-1" key={index}>
+                                    <div className="min-w-[37%]">{item.totalProfit} USDC</div>
+                                    <div className="min-w-[35%]">{item.weeklyProfit} USDC</div>
+                                    <div className="min-w-[30%]">{item.roi} %</div>
                                 </div>
                             );
                         })}
@@ -455,14 +465,14 @@ export default function Home() {
                 <div className='tradeCard blueCover2'>
                     <div className='tt text-xl pb-2'>Weekly Deposits</div>
                     <div className="flex gap-2 items-center justify-left">
-                        <div className="min-w-[20%]">Amount</div>
-                        <div className="min-w-[40%]">Address</div>
+                        <div className="nn text-sm min-w-[20%]">Amount</div>
+                        <div className="nn text-sm min-w-[40%]">Address</div>
                     </div>
                     {weeklyDepositsInfo.map((item, index) => {
                         return (
-                            <div className="flex gap-2 items-center justify-left" key={index}>
+                            <div className="flex gap-2 items-center justify-left py-1" key={index}>
                                 <div className="min-w-[20%]">{item.amount} USDC</div>
-                                <div className="min-w-[40%]">{item.address}</div>
+                                <div className="min-w-[40%] break-words">{item.address}</div>
                             </div>
                         );
                     })}

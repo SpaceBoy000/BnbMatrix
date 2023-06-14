@@ -15,6 +15,7 @@ const Wrapper = styled("div")(({ theme }) => ({
     flexDirection:'column',
     height: '100vh',
     [theme.breakpoints.down("md")]: {
+        padding: '40px 20px 20px 20px',
     },
 }));
 
@@ -43,11 +44,11 @@ const Layout = (props) => {
     return (
         <Wrapper>
             <NavBar>
-                <div className="title">
+                <div className="title flex justify-center md:justify-start">
                     <img src={logoImg} width='200px'/>
                 </div>
                 <ButtonRow>
-                    <button className="myButton menuBtn" onClick={() => {setOnMenu(!onMenu)}}>Menu</button>
+                    <button className="menuBtn" onClick={() => {setOnMenu(!onMenu)}}>Menu</button>
                     <div className="connectBtn">
                         <Connect/>
                     </div>

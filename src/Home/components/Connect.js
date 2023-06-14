@@ -15,17 +15,15 @@ const ConnectButton = styled('button')(({ theme }) => ({
   paddingRight: "1rem",
   paddingTop: "0.25rem",
   paddingBottom: "0.25rem",
-  fontSize: "1rem",
+  fontSize: "16px",
+  fontFamily: 'mediumPolice',
   lineHeight: "1.5rem",
-  // textTransform: "uppercase",
   letterSpacing: "0.05em",
-  // background: "#11B470",
-  background: "linear-gradient(90deg, #5adbe4 0%, #024eaf 100%)",
+  background: "linear-gradient(90deg, #004AAD 0%, #5DE0E6 100%)",
   maxHeight: "40px",
   marginTop: "auto",
   marginBottom: "auto",
   minWidth: '135px',
-  // color: theme.typography.allVariants.color,
   color:"white",
   [theme.breakpoints.down("md")]: {
     
@@ -40,7 +38,7 @@ const SmallScreenConnectButton = styled(Button)(({ theme }) => ({
   marginLeft: "auto",
   marginRight: "auto",
   borderRadius: 5,
-  background: "linear-gradient(159deg, rgb(255, 244, 39) 0%, rgb(255, 61, 61) 84%, rgb(255, 61, 61) 100%)",
+  background: "linear-gradient(90deg, #004AAD 0%, #5DE0E6 100%)",
   boxShadow: "rgb(0 0 0 / 59%) 6px 6px 20px 6px",
   color: "white",
   [theme.breakpoints.down("md")]: {
@@ -67,9 +65,6 @@ export default function Connect({ responsive = true }) {
       >
         {address ? shorten(address) : t("Connect")}
       </ConnectButton>
-      {/* <LanguageButton>
-        <DropdownLanguage />
-      </LanguageButton> */}
     </>
   ) : (
     <>
@@ -81,9 +76,6 @@ export default function Connect({ responsive = true }) {
       >
         {address ? t("Disconnect") : t("Connect")}
       </SmallScreenConnectButton>
-      {/* <SmallScreenLanguageButton>
-        <DropdownLanguage />
-      </SmallScreenLanguageButton> */}
     </>
   );
 }

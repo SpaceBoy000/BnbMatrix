@@ -167,7 +167,7 @@ export default function Header({onMenu, setOnMenu}) {
       <div className="header_menu">
         <Item>
           <Link
-            to="/"
+            to="/dashboard"
             className='tab'
             style={{color: location.pathname.includes('dashboard') ? '#3574b9' : 'white'}}
           >

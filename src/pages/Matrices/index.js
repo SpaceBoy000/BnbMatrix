@@ -3,6 +3,7 @@ import { styled } from "@mui/system";
 import "./style.css"
 import { shorten } from "../../Home/components/Connect";
 import { useContractContext } from '../../providers/ContractProvider';
+import { FaCopy } from 'react-icons/fa';
 
 import { copyfunc } from '../../Home';
 
@@ -36,9 +37,9 @@ const Matrices = () => {
 
     let contractInfos = [
         { label: 'Total Investments', value: 0, unit: 'USDC' },
-        { label: 'Total Value locked', value: 0, unit: 'USDC' },
+        { label: 'Total Value Locked', value: 0, unit: 'USDC' },
         { label: 'Weekly ROI', value: 0, unit: "%" },
-        { label: 'Organization', value: 0, unit: "MEmbers" },
+        { label: 'Organization', value: 0, unit: "Members" },
     ]
 
     // const timeString = useMemo(() => {
@@ -167,6 +168,12 @@ const Matrices = () => {
         fetchContractInfo();
     }, [contract]);
 
+    const handleClickCopy = () => {
+        navigator.clipboard.writeText("https://usdc-matrix.netlify.app/?ref=");
+        // toast.success('Referral link has been copied!');
+        console.log("handleClickCopy>>>>>>>>>>>");
+    }
+
     return (
         <Wrapper>
             <div className='contractInfo'>
@@ -174,122 +181,97 @@ const Matrices = () => {
                     contractInfos.map((item, index) => {
                         return (
                             <div className="contractInfoItem" key={index}>
-                                <span className="tt">{item.label}</span>
-                                <span className='nn'>{item.value + " " + item.unit} </span>
+                                <span className="rr">{item.label}</span>
+                                <span className='tt font-bold pt-2'>{item.value + " " + item.unit} </span>
                             </div>
                         );
                     })
                 }
             </div>
 
-            <div className='flex gap-4'>
+            <div className='flex flex-col md:flex-row gap-4'>
                 <div className='tradeCard'>
-                    <span className='tt text-xl pb-2'>Matrix</span>
-                    <span className='tt'>Deposit USDC to enter the Mmatrix</span>
+                    <span className='tt text-xl'>Matrix</span>
+                    <span className='nn text-sm font-thin py-4'>Deposit USDC to enter the Matrix</span>
                     <div className="flex gap-6">
-                        <div className='tt bg-white text-black rounded-lg px-2'>+1234 USDC</div>
-                        <div className='tt bg-white text-black rounded-lg px-2'>10.00%</div>
+                        <div className='tt bg-white text-black rounded-lg px-2 py-1 w-full text-center'>0.00 USDC</div>
+                        <div className='tt bg-[#3574b9] text-white rounded-lg px-2 py-1 w-full text-center cursor-pointer hover:-translate-y-0.5'>Deposit</div>
                     </div>
                 </div>
                 <div className='tradeCard flex flex-row'>
                     <div className='w-1/2'>
-                        <div className='tt text-xl pb-2'>Referral</div>
+                        <div className='tt text-xl pb-4'>Referral</div>
                         <div className="gap-2 items-center">
-                            <div>Referral Rewards</div>
+                            <div className='nn text-sm font-thin pb-1'>Referral Rewards</div>
                             <div>2.45 USDC</div>
                         </div>
                     </div>
                     <div className='w-1/2'>
-                        <div className='tt text-xl pb-2'>Referral link</div>
+                        <div className='nn text-sm font-thin flex pb-2 items-center cursor-pointer hover:-translate-y-0.5' onClick={() => {copyfunc("https://usdc-matrix.netlify.app/?ref=")}}>Referral link<FaCopy size="1.7em" className="pl-2" /></div>
                         <div className="gap-2 items-center">
-                            <div>Claim</div>
-                            <div>Invest</div>
+                            <div className='tt bg-[#11b470] text-white rounded-lg px-2 py-0.5 my-3 w-full text-center min-w-[150px] cursor-pointer hover:-translate-y-0.5'>Claim</div>
+                            <div className='tt bg-[#3574b9] text-white rounded-lg px-2 py-0.5 my-3 w-full text-center min-w-[150px] cursor-pointer hover:-translate-y-0.5'>Invest</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='tradeCard'>
+            <div className='tradeCard overflow-x-scroll md:overflow-x-hidden'>
                 <span className='tt text-xl pb-2'>Your Matrices</span>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-center">
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Total Deposited</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Total Deposited</div>
                         <div>100.00 USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Currently Staked</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Currently Staked</div>
                         <div>90.00 USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Daily Earnings</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Daily Earnings</div>
                         <div>0.96 USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Total Withdrawn</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Total Withdrawn</div>
                         <div>11.00 USDC</div>
                     </div>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between mt-3 items-center text-center">
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Claimable Earnings</div>
-                        <div>6.75 USDC</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Claimable Earnings</div>
+                        <div className='text-center'>6.75 USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Timer</div>
-                        <div>06D 12H 02M</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Timer</div>
+                        <div className='text-center'>06D 12H 02M</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div>Claim All</div>
+                        <div className='tt bg-[#ff3131] text-white rounded-lg px-2 py-0.5 my-3 w-full text-center min-w-[150px] cursor-pointer hover:-translate-y-0.5'>Claim All</div>
                     </div>
                 </div>
             </div>
             
-            <div className='tradeCard blueCover2'>
-                <span className='tt text-xl pb-2'>Matrices 1</span>
-                <div className="flex justify-between">
+            <div className='tradeCard blueCover2 overflow-x-scroll'>
+                <span className='tt text-xl pb-2'>Matrix 1</span>
+                <div className="flex justify-between text-center">
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Amount Invested</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Amount Invested</div>
                         <div>100.00 USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Active Balance</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Active Balance</div>
                         <div>90.00 USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Daily Earnings</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Daily Earnings</div>
                         <div>0.96 USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Total Profit</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Total Profit</div>
                         <div>11.00 USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Unstake</div>
-                        <div>10 Cycles</div>
-                    </div>
-                </div>
-            </div>
-            <div className='tradeCard blueCover2'>
-                <span className='tt text-xl pb-2'>Matrices 2</span>
-                <div className="flex justify-between">
-                    <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Amount Invested</div>
-                        <div>100.00 USDC</div>
-                    </div>
-                    <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Active Balance</div>
-                        <div>90.00 USDC</div>
-                    </div>
-                    <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Daily Earnings</div>
-                        <div>0.96 USDC</div>
-                    </div>
-                    <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Total Profit</div>
-                        <div>11.00 USDC</div>
-                    </div>
-                    <div className='tt rounded-lg px-2'>
-                        <div className='text-sm font-thin'>Unstake</div>
-                        <div>10 Cycles</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Unstake</div>
+                        <div className='tt bg-[#11b470] text-white rounded-lg px-2 py-0.5 w-full text-center cursor-pointer hover:-translate-y-0.5'>10 Cycles</div>
                     </div>
                 </div>
             </div>
