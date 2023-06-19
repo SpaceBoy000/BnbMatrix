@@ -18,7 +18,6 @@ function App() {
             <Routes>
               <Route exact path="/" element={ <Navigate to="/dashboard"/> }/>
               <Route exact path="/dashboard" element={ <Home /> }/>
-              {/* <Route exact path="/nft" element={ <NFT /> }/> */}
               <Route exact path="/matrices" element={ <Matrices /> }/>
               <Route exact path="/admin" element={ <Admin /> }/>
             </Routes>
