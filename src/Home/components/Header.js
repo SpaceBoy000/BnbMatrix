@@ -18,8 +18,10 @@ const Wrapper = styled("div")(({ theme }) => ({
   height: '100%',
   display:'flex',
   flexDirection: 'column',
+  position: 'fixed',
 
   [theme.breakpoints.down("md")]: {
+    position: 'relative',
     h5: {
       fontSize: 20,
       margin: 0,
@@ -50,116 +52,114 @@ export default function Header({onMenu, setOnMenu}) {
   return (
     <Wrapper>
       { onMenu === true ? (
-        <div>
-          <div className="mobile_head">
-            <div className="mobile_herader_content">
-              {/* <div style={{alignSelf:"center", marginBottom:"30px"}}>
-                <img src="./favicon.png" alt="[SolMatrix]" width="60px"/>
-              </div> */}
-              <div className="mobile_four_btn">
-                <div onClick= {() => {
-                  setOnMenu(false)
-                }}>
-                  <Link
-                    to="/dashboard"
-                    className="tab"
-                    style={{
-                      color: location.pathname.includes('dashboard') ? '#3574b9' : 'white',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    Dashboard
-                  </Link>
-                </div>
-                <div onClick={() => {
-                  setOnMenu(false)
-                }}>
-                  <Link
-                    to="/matrices"
-                    className="tab"
-                    style={{
-                      color: location.pathname.includes('matrices') ? '#3574b9' : 'white',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    Matrices
-                  </Link>
-                </div>
-                {/* <div onClick={() => {
-                    setOnMenu(false)
-                  }}>
-                    <Link
-                      to="/nft"
-                      className="tab"
-                      style={{
-                        color: location.pathname.includes('nft') ? '#3574b9' : 'white',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      NFT
-                    </Link>
-                  </div> */}
-                {
-                  // wallet && wallet?.publicKey && wallet?.publicKey.toBase58() === 
-                  // settingsData?.account.admin.toBase58()?
-                  // <div onClick={() => {
-                  //   setOnMenu(false)
-                  // }}>
-                  //   <Link
-                  //     to="/admin"
-                  //     className="tab"
-                  //     style={{
-                  //       color: location.pathname.includes('admin') ? '#3574b9' : 'white',
-                  //       textDecoration: 'none',
-                  //     }}
-                  //   >
-                  //     Admin
-                  //   </Link>
-                  // </div>
-                  // : <></>
-                }
-                
-
-                <Divider />
-                <div onClick={() => {
-                  setOnMenu(false)
-                }}>
-                  <a href={config.scanLink} target="_blank" className="tab">
-                    Contract
-                  </a>
-                </div>
-                <div onClick={() => {
-                  setOnMenu(false)
-                }}>
-                  <a href="/" target="_blank" className="tab">
-                    Docs
-                  </a>
-                </div>
-                <div onClick={() => {
-                  setOnMenu(false)
-                }}>
-                  <a href="/" target="_blank" className="tab">
-                    Audit
-                  </a>
-                </div>
-                <div onClick={() => {
-                  setOnMenu(false)
-                }}>
-                  <a href="/" target="_blank" className="tab">
-                    KYC
-                  </a>
-                </div>
-              </div>
-              <div style={{flex:1}}></div>
-              {/* <Social/> */}
-            </div>
-            <div
-              className="empty_mobile"
-              onClick={() => {
+        <div className="mobile_head max-w-md">
+          <div className="mobile_herader_content">
+            {/* <div style={{alignSelf:"center", marginBottom:"30px"}}>
+              <img src="./favicon.png" alt="[SolMatrix]" width="60px"/>
+            </div> */}
+            <div className="mobile_four_btn">
+              <div onClick= {() => {
                 setOnMenu(false)
-              }}
-            ></div>
+              }}>
+                <Link
+                  to="/dashboard"
+                  className="tab"
+                  style={{
+                    color: location.pathname.includes('dashboard') ? '#3574b9' : 'white',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Dashboard
+                </Link>
+              </div>
+              <div onClick={() => {
+                setOnMenu(false)
+              }}>
+                <Link
+                  to="/matrices"
+                  className="tab"
+                  style={{
+                    color: location.pathname.includes('matrices') ? '#3574b9' : 'white',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Matrices
+                </Link>
+              </div>
+              {/* <div onClick={() => {
+                  setOnMenu(false)
+                }}>
+                  <Link
+                    to="/nft"
+                    className="tab"
+                    style={{
+                      color: location.pathname.includes('nft') ? '#3574b9' : 'white',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    NFT
+                  </Link>
+                </div> */}
+              {
+                // wallet && wallet?.publicKey && wallet?.publicKey.toBase58() === 
+                // settingsData?.account.admin.toBase58()?
+                // <div onClick={() => {
+                //   setOnMenu(false)
+                // }}>
+                //   <Link
+                //     to="/admin"
+                //     className="tab"
+                //     style={{
+                //       color: location.pathname.includes('admin') ? '#3574b9' : 'white',
+                //       textDecoration: 'none',
+                //     }}
+                //   >
+                //     Admin
+                //   </Link>
+                // </div>
+                // : <></>
+              }
+              
+
+              <Divider />
+              <div onClick={() => {
+                setOnMenu(false)
+              }}>
+                <a href={config.scanLink} target="_blank" className="tab">
+                  Contract
+                </a>
+              </div>
+              <div onClick={() => {
+                setOnMenu(false)
+              }}>
+                <a href="/" target="_blank" className="tab">
+                  Docs
+                </a>
+              </div>
+              <div onClick={() => {
+                setOnMenu(false)
+              }}>
+                <a href="/" target="_blank" className="tab">
+                  Audit
+                </a>
+              </div>
+              <div onClick={() => {
+                setOnMenu(false)
+              }}>
+                <a href="/" target="_blank" className="tab">
+                  KYC
+                </a>
+              </div>
+            </div>
+            <div style={{flex:1}}></div>
+            {/* <Social/> */}
           </div>
+          <div
+            className="empty_mobile"
+            onClick={() => {
+              setOnMenu(false)
+            }}
+          ></div>
         </div>
       )
       : null }

@@ -16,7 +16,7 @@ const Wrapper = styled("div")(({ theme }) => ({
     textAlign: 'center',
     // background: "linear-gradient(90deg, #fedd58 15%, #eec433 84%, #e0ae13 100%)",
     fontSize: '20px',
-    height: '100%',
+    // height: '100%',
     fontFamily: 'mediumPolice',
     [theme.breakpoints.down("md")]: {
         // height:'100vh'
@@ -33,11 +33,14 @@ const Matrices = () => {
     const [userTotalDeposited, setUserTotalDeposited] = useState(0);
     const [main, setMain] = useState([]);
     const [userKey, setUsersKey] = useState([]);
+    const [claimables, setClaimables] = useState(0);
+    const [claimable, setClaimable] = useState(false);
     const [userInfo, setUserInfo] = useState([]);
     const [refLink, setRefLink] = useState('Copy Referral Link');
     const [refBonus, setRefBonus] = useState(0);
     const [dailyProfit, setDailyProfit] = useState(0);
     const [totalActives, setTotalActives] = useState(0);
+    const [totalWiths, setTotalWiths] = useState(0);
     const [loading, setLoading] = useState(false);
     const [lastDepositTime, setLastDepositTime] = useState(0);
     const [lastWinner, setLastWinner] = useState('0x0000000000000000000000000000000000000000');
@@ -182,7 +185,9 @@ const Matrices = () => {
             setUserInfo(userInfo);
             setUserTotalDeposited(fromWei(userKey.totalInits));
             setRefBonus(fromWei(userKey.refBonus));
-            console.log("xxxxxxxxxxxx: ", userKey.refBonus);
+            setClaimables(fromWei(userKey.claimableAmount));
+            setClaimable(Date.now() / 1000 > userKey.nextClaim ? true : false);
+            setTotalWiths(fromWei(userKey.totalWiths));
             let totalActives = 0;
             userInfo.forEach(item => {
                 totalActives += parseFloat(fromWei(item.curAmt));
@@ -217,25 +222,25 @@ const Matrices = () => {
         refData();
     }, [address]);
 
-    useEffect(() => {
-        const fetchContractInfo = async () => {
-            try {
-                const [main, userInfo] = await Promise.all([
-                    contract.methods.MainKey(1)
-                        .call({from: address})
-                        .catch((err) => {
-                            console.log(err);
-                            return 0;
-                        }),
-                ]);
-                setMain(main);
-                setTotalInvestment(fromWei(main.ovrTotalDeps));
-            } catch (err) {
-                console.log(err);
-            }
-        }
-        fetchContractInfo();
-    }, [contract]);
+    // useEffect(() => {
+    //     const fetchContractInfo = async () => {
+    //         try {
+    //             const [main, userInfo] = await Promise.all([
+    //                 contract.methods.MainKey(1)
+    //                     .call({from: address})
+    //                     .catch((err) => {
+    //                         console.log(err);
+    //                         return 0;
+    //                     }),
+    //             ]);
+    //             setMain(main);
+    //             setTotalInvestment(fromWei(main.ovrTotalDeps));
+    //         } catch (err) {
+    //             console.log(err);
+    //         }
+    //     }
+    //     fetchContractInfo();
+    // }, [contract]);
 
     const handleClickCopy = () => {
         navigator.clipboard.writeText("https://usdc-matrix.netlify.app/?ref=");
@@ -255,6 +260,13 @@ const Matrices = () => {
     };
 
     const onDeposit = async () => {
+        if (amount < 10) {
+            Toast.fire({
+                icon: 'error',
+                title: "Minimum deposit amount is 10USDC."
+            });
+            return;
+        }
         setLoading(true);
         try {
             let ref = getRef();
@@ -271,18 +283,6 @@ const Matrices = () => {
             // refreshData();
             fetchWalletBalance();
             // fetchContractBNBBalance();
-        } catch (err) {
-            console.error(err);
-        }
-        setLoading(false);
-    }
-    
-    const onClaimRefBonus = async () => {
-        setLoading(true);
-        try {
-            await contract.methods.withdrawRefBonus().send({from: address});
-            fetchWalletBalance();
-            fetchUserInfo();
         } catch (err) {
             console.error(err);
         }
@@ -312,8 +312,35 @@ const Matrices = () => {
         }
         setLoading(false);
     }
+
+    const onClaimRefBonus = async () => {
+        if (refBonus <= 0) {
+            Toast.fire({
+                icon: 'error',
+                title: "There is no referral rewards."
+            });
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await contract.methods.withdrawRefBonus().send({from: address});
+            fetchWalletBalance();
+            fetchUserInfo();
+        } catch (err) {
+            console.error(err);
+        }
+        setLoading(false);
+    }
     
     const stakeRefBonus = async () => {
+        if (refBonus <= 0) {
+            Toast.fire({
+                icon: 'error',
+                title: "There is no referral rewards."
+            });
+            return;
+        }
         setLoading(true);
         try {
             await contract.methods.stakeRefBonus().send({from: address});
@@ -327,7 +354,7 @@ const Matrices = () => {
 
     return (
         <Wrapper>
-            <div className='contractInfo'>
+            {/* <div className='contractInfo'>
                 {
                     contractInfos.map((item, index) => {
                         return (
@@ -338,7 +365,7 @@ const Matrices = () => {
                         );
                     })
                 }
-            </div>
+            </div> */}
 
             <div className='flex flex-col md:flex-row gap-4'>
                 <div className='tradeCard'>
@@ -351,8 +378,7 @@ const Matrices = () => {
                                 // type='number'
                                 value={amount}
                                 onChange={(e) => { setAmount(e.target.value) }}
-                                className='nn'
-                                style={{ width: '100%', marginRight: '20px', border: 'none' }}
+                                className='nn w-full outline-none'
                             />
                         </div>
                         <div className='tt bg-[#3574b9] text-white rounded-lg px-2 py-1 w-full text-center cursor-pointer hover:-translate-y-0.5'
@@ -396,20 +422,26 @@ const Matrices = () => {
                     </div>
                     <div className='tt rounded-lg px-2'>
                         <div className='nn text-sm font-thin min-w-[150px]'>Total Withdrawn</div>
-                        <div>0.0 USDC</div>
+                        <div>{totalWiths} USDC</div>
                     </div>
                 </div>
                 <div className="flex justify-between mt-3 items-center text-center">
                     <div className='tt rounded-lg px-2'>
-                        <div className='nn text-sm font-thin min-w-[150px]'>Claimable Earnings</div>
-                        <div className='text-center'>0.0 USDC</div>
+                        <div className='nn text-sm font-thin min-w-[200px]'>Claimable Earnings</div>
+                        <div className='text-center'>{claimables} USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div className='nn text-sm font-thin min-w-[150px]'>Timer</div>
-                        <div className='text-center'>{`${countdown.days}D ${countdown.minutes < 10 ? '0' + countdown.minutes : countdown.minutes}M ${countdown.seconds < 10 ? '0' + countdown.seconds : countdown.seconds}S`}</div>
+                        <div className='nn text-sm font-thin min-w-[250px]'>Timer</div>
+                        <div className='text-center'>{`${countdown.days}D ${countdown.hours}H ${countdown.minutes < 10 ? '0' + countdown.minutes : countdown.minutes}M ${countdown.seconds < 10 ? '0' + countdown.seconds : countdown.seconds}S`}</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
-                        <div className='tt bg-[#ff3131] text-white rounded-lg px-2 py-0.5 my-3 w-full text-center min-w-[150px] cursor-pointer hover:-translate-y-0.5' onClick = {onReserveClaim}>Reserve Claim</div>
+                        {
+                            claimables > 0 ?
+                            <div className={`${claimable ? "bg-[#11b470]" : "bg-[#ff3131]"} tt text-white rounded-lg px-2 py-0.5 my-3 w-full text-center min-w-[200px] cursor-pointer hover:-translate-y-0.5`} onClick = {onClaimRewards}>Claim Rewards</div>
+                            :
+                            <div className={`${claimables > 0 ? "bg-[#11b470]" : "bg-[#ff3131]"} tt text-white rounded-lg px-2 py-0.5 my-3 w-full text-center min-w-[200px] cursor-pointer hover:-translate-y-0.5`} onClick = {onReserveClaim}>Reserve Claim</div>
+                        }
+                        
                     </div>
                 </div>
             </div>
@@ -417,9 +449,11 @@ const Matrices = () => {
                 userInfo.map((item, index) => {
                     const amountInvested = fromWei(item.amt);
                     const activeBalance = fromWei(item.curAmt);
+                    const cycles = parseInt(item.cycles) + Math.floor((Date.now() / 1000 - item.depoTime) / (86400 * 7));
+                    // const totalProfit = fromWei(item.totalProfit);
                     return (
                         <div className='tradeCard blueCover2 overflow-x-scroll' key={index}>
-                            <span className='tt text-xl pb-2'>Matrix 1</span>
+                            <span className='tt text-xl pb-2'>Matrix {index + 1}</span>
                             <div className="flex justify-between text-center">
                                 <div className='tt rounded-lg px-2'>
                                     <div className='nn text-sm font-thin min-w-[150px]'>Amount Invested</div>
@@ -435,11 +469,11 @@ const Matrices = () => {
                                 </div>
                                 <div className='tt rounded-lg px-2'>
                                     <div className='nn text-sm font-thin min-w-[150px]'>Total Profit</div>
-                                    <div className='text-red-600'>11.00 USDC</div>
+                                    <div className='text-red-600'>{0} USDC</div>
                                 </div>
                                 <div className='tt rounded-lg px-2'>
                                     <div className='nn text-sm font-thin min-w-[150px]'>Unstake</div>
-                                    <div className='tt bg-[#11b470] rounded-lg px-2 py-0.5 w-full text-center cursor-pointer hover:-translate-y-0.5'>10 Cycles</div>
+                                    <div className={`${cycles > 7 ? "bg-[#11b470]" : "bg-[#ff3131]"}  tt rounded-lg px-2 py-0.5 w-full text-center cursor-pointer hover:-translate-y-0.5`}>{ cycles } Cycles</div>
                                 </div>
                             </div>
                         </div>

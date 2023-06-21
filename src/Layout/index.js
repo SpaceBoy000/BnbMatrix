@@ -2,6 +2,7 @@ import { styled } from "@mui/system";
 import "./style.css"
 
 import Header from '../Home/components/Header'
+import SubNav from '../Home/components/SubNav'
 import Connect from "../Home/components/Connect";
 import { useSSR } from "react-i18next";
 import { useState } from "react";
@@ -21,11 +22,12 @@ const Wrapper = styled("div")(({ theme }) => ({
 
 const NavBar = styled("div")(({ theme }) => ({
     display:'flex',
-    justifyContent:'space-between', 
+    justifyContent:'right', 
     alignItems:'center', 
     marginBottom:'20px',
     [theme.breakpoints.down("md")]: {
         display: 'unset',
+        justifyContent:'space-between', 
     },
 }));
 
@@ -44,7 +46,7 @@ const Layout = (props) => {
     return (
         <Wrapper>
             <NavBar>
-                <div className="title flex justify-center md:justify-start">
+                <div className="title flex justify-center md:justify-start relative lg:fixed lg:left-8">
                     <img src={logoImg} width='200px'/>
                 </div>
                 <ButtonRow>
@@ -59,6 +61,7 @@ const Layout = (props) => {
                     <Header onMenu={onMenu} setOnMenu={setOnMenu}/>
                 </div>
                 <div className="main_content">
+                    <SubNav/>
                     { props.children }
                 </div>
             </div>
