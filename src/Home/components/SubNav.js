@@ -7,12 +7,13 @@ export default function SubNav() {
 
     const [totalInvestment, setTotalInvestment] = useState(0);
     const [contractBalance, setContractBalance] = useState(0);
+    const [weeklyProfit, setWeeklyProfit] = useState(70);
     const [main, setMain] = useState([]);
 
     let contractInfos = [
         { label: 'Total Investments', value: totalInvestment, unit: 'USDC' },
         { label: 'Total Value Locked', value: contractBalance, unit: 'USDC' },
-        { label: 'Weekly ROI', value: 7, unit: "%" },
+        { label: 'Weekly ROI', value: weeklyProfit/10, unit: "%" },
         { label: 'Organization', value: main?.users == undefined ? 0 : main?.users, unit: "Members" },
     ]
 
@@ -21,7 +22,7 @@ export default function SubNav() {
             if (!contract) return;
             console.log("NavBar: ", contract);
             try {
-                const [main, contractBalance] = await Promise.all([
+                const [main, contractBalance, weeklyProfit] = await Promise.all([
                     contract.methods.MainKey(1)
                         .call()
                         .catch((err) => {
@@ -34,12 +35,19 @@ export default function SubNav() {
                             console.log(err);
                             return 0;
                         }),
+                    contract.methods.weeklyProfit()
+                        .call()
+                        .catch((err) => {
+                            console.log(err);
+                            return 0;
+                        }),
                 ]);
                 console.log("contractBalance: ", contractBalance);
                 console.log("main.ovrTotalDeps: ", main);
                 setMain(main);
                 setContractBalance(fromWei(String(contractBalance)));
                 setTotalInvestment(fromWei(String(main.ovrTotalDeps)));
+                setWeeklyProfit(weeklyProfit);
             } catch (err) {
                 console.log(err);
             }
@@ -51,7 +59,7 @@ export default function SubNav() {
         <div className="text-white">
             <div className='contractInfo'>
                 {
-                    contractInfos.map((item, index) => {
+                    contractInfos && contractInfos.map((item, index) => {
                         return (
                             <div className="contractInfoItem" key={index}>
                                 <span className="rr">{item.label}</span>

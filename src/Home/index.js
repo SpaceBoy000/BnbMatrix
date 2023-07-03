@@ -55,6 +55,10 @@ export const copyfunc = async (text) => {
     }
 }
 
+const shorten = (str) => {
+    return str.slice(0, 6) + "..." + str.slice(38);
+}
+
 export default function Home() {
     const { web3, contract, wrongNetwork, getBnbBalance, fromWei, toWei } = useContractContext();
     const { address, chainId } = useAuthContext();
@@ -63,41 +67,16 @@ export default function Home() {
     const [stakedAmount, setStakedAmount] = useState(10);
     const [weeklyProfit, setWeeklyProfit] = useState(7);
     const [period, setPeriod] = useState(0);
-
+    const [cycleNo, setCycleNo] = useState(1);
     const [weeklyDepositsHistory, setWeeklyDepositHistory] = useState([]);
-    const [weeklyClaimHistory, setWeeklyClaimHistory] = useState([]);
-
     
     const calculate = (v) => {
         // setSliderValue(v);
         console.log("staked amount: ", stakedAmount);
         console.log("calculate: ", v);
         setPeriod(v);
-        setTotalProfit((stakedAmount * weeklyProfit / 100 * v).toFixed(1));
+        setTotalProfit((stakedAmount * (1 + weeklyProfit / 100) ** v - stakedAmount).toFixed(2));
     }
-
-    let contractInfos = [
-        { label: 'Total Investments', value: 0, unit: 'USDC' },
-        { label: 'Total Value Locked', value: 0, unit: 'USDC' },
-        { label: 'Weekly ROI', value: 0, unit: "%" },
-        { label: 'Organization', value: 0, unit: "Members" },
-    ]
-
-    let profitData = [
-        {totalProfit: 15, weeklyProfit: 5, roi: 12},
-        {totalProfit: 10, weeklyProfit: 4, roi: 10},
-        {totalProfit: 6, weeklyProfit: 3, roi: 7.5},
-        {totalProfit: 3, weeklyProfit: 2, roi: 5},
-        {totalProfit: 1, weeklyProfit: 1, roi: 3},
-    ]
-    
-    // let weeklyDepositsInfo = [
-    //     {amount: 15, address: '0xbE32d169b07411595391B8A1E56636ac31164486'},
-    //     {amount: 10, address: '0xbE32d169b07411595391B8A1E56636ac31164486'},
-    //     {amount: 6, address: '0xbE32d169b07411595391B8A1E56636ac31164486'},
-    //     {amount: 3, address: '0xbE32d169b07411595391B8A1E56636ac31164486'},
-    //     {amount: 1, address: '0xbE32d169b07411595391B8A1E56636ac31164486'},
-    // ]
 
     let isMobile = window.matchMedia("only screen and (max-width: 900px)").matches;
 
@@ -112,30 +91,30 @@ export default function Home() {
         return ref;
     };
 
-    const [countdown, setCountdown] = useState({
-        alive: true,
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0
-    })
+    // const [countdown, setCountdown] = useState({
+    //     alive: true,
+    //     days: 0,
+    //     hours: 0,
+    //     minutes: 0,
+    //     seconds: 0
+    // })
 
-    const getCountdown = (deadline) => {
-        const now = Date.now() / 1000;
-        const total = deadline - now;
-        const seconds = Math.floor((total) % 60);
-        const minutes = Math.floor((total / 60) % 60);
-        const hours = Math.floor((total / (60 * 60)) % 24);
-        const days = Math.floor(total / (60 * 60 * 24));
+    // const getCountdown = (deadline) => {
+    //     const now = Date.now() / 1000;
+    //     const total = deadline - now;
+    //     const seconds = Math.floor((total) % 60);
+    //     const minutes = Math.floor((total / 60) % 60);
+    //     const hours = Math.floor((total / (60 * 60)) % 24);
+    //     const days = Math.floor(total / (60 * 60 * 24));
 
-        return {
-            total,
-            days,
-            hours,
-            minutes,
-            seconds
-        };
-    }
+    //     return {
+    //         total,
+    //         days,
+    //         hours,
+    //         minutes,
+    //         seconds
+    //     };
+    // }
 
 
     // useEffect(() => {
@@ -164,27 +143,40 @@ export default function Home() {
             console.log("NavBar: ", contract);
             try {
                 const cycleNo = await contract.methods.getCycleCounter().call();
+                setCycleNo(parseInt(cycleNo) + 1);
                 console.log("cycleNo: ", cycleNo);
                 
-                const [depositHistory, claimHistory] = await Promise.all([
+                let [depositHistory/*, topDeposits*/] = await Promise.all([
                     contract.methods.getWeeklyDepositHistory(cycleNo)
                         .call()
                         .catch((err) => {
                             console.log(err);
                             return 0;
                         }),
-                    contract.methods.getWeeklyClaimHistory(cycleNo)
-                        .call()
-                        .catch((err) => {
-                            console.log(err);
-                            return 0;
-                        }),
+                    // contract.methods.getTopDepositHistory()
+                    //     .call()
+                    //     .catch((err) => {
+                    //         console.log(err);
+                    //         return 0;
+                    //     }),
                 ]);
-                console.log("depositHistory: ", depositHistory);
-                console.log("claimHistory: ", claimHistory);
+                console.log("depositHistory: ", depositHistory[0].amount);
+                let sortedHistory;
 
+                if (depositHistory.length > 0) {
+                    depositHistory = depositHistory.slice().sort(function(x, y) {return y.amount - x.amount});
+                    depositHistory.length = Math.min(depositHistory.length, 6);
+                }
+                
                 setWeeklyDepositHistory(depositHistory);
-                setWeeklyClaimHistory(claimHistory);
+                console.log("After sorting depositHistory: ", depositHistory);
+                // let rTop = [];
+                // for (let i = topDeposits.length - 1; i >= 0; i--) {
+                //     rTop.push(topDeposits[i]);
+                // }
+                
+                // console.log("topDeposits: ", topDeposits);
+                // setTopDeposits(rTop);
                 
             } catch (err) {
                 console.log(err);
@@ -246,7 +238,7 @@ export default function Home() {
                     <div className='tradeCard'>
                         <div className='tt text-xl pb-2'>Track Our Trades</div>
                         <div className="flex gap-2 items-center">
-                            <div>Our trading strategies allow USDC Matrix to generate external revenure. Join the Telegram Channel</div>
+                            <div>Our trading strategies allow USDC Matrix to generate external revenue.<br/> Join the Telegram Channel.</div>
                             <a href="https://t.me/" target="_blank" alt="telegram link" className="w-[150px] hover:-translate-y-0.5"><img src={telegramIcon} width="64px" height="64px" alt="telegramIcon"/></a>
                         </div>
                     </div>
@@ -284,7 +276,7 @@ export default function Home() {
                             </div>
                         </div>
                         <div className="text-center items-center self-center w-2/3">
-                            <div className='nn text-sm pt-3'>Period {period} weeks</div>
+                            <div className='nn text-sm pt-3'>Period: {period} weeks</div>
                             <div className="text-center">
                                 <MuiThemeProvider muiTheme={muiTheme}>
                                 <Slider
@@ -308,32 +300,34 @@ export default function Home() {
                             </div>
                         </div>
                     </div>
-                    <div className='tradeCard blueCover2 text-center'>
-                        <div className='tt text-xl pb-3 text-left'>Profits Distributed</div>
-                        <div className="flex items-center justify-left pb-2">
-                            <div className="nn text-sm min-w-[35%]">Total Profits</div>
-                            <div className="nn text-sm min-w-[35%]">Weekly Profits</div>
-                            <div className="nn text-sm min-w-[30%]">ROI</div>
+                    <div className='tradeCard blueCover2 text-left max-h-[280px] overflow-y-hidden'>
+                        <div className='tt text-xl pb-3 text-left'>Top Weekly Deposits</div>
+                        <div className="flex items-center justify-left pb-2 gap-2">
+                            <div className="nn text-sm min-w-[10%]"></div>
+                            <div className="nn text-sm min-w-[35%]">Amount</div>
+                            <div className="nn text-sm">Address</div>
                         </div>
-                        {weeklyClaimHistory.map((item, index) => {
-                            return (
-                                <div className="flex items-center justify-left pb-1" key={index}>
-                                    <div className="min-w-[37%]">{item.totalProfit} USDC</div>
-                                    <div className="min-w-[35%]">{item.weeklyProfit} USDC</div>
-                                    <div className="min-w-[30%]">{item.roi} %</div>
-                                </div>
-                            );
+                        {weeklyDepositsHistory && weeklyDepositsHistory.map((item, index) => {
+                            if (parseFloat(item.amount) > 0) {
+                                return (
+                                    <div className="flex items-center justify-left pb-1 gap-2" key={index}>
+                                        <div className="min-w-[10%]">#{index+1}</div>
+                                        <div className="min-w-[35%]">{fromWei(item.amount)} USDC</div>
+                                        <div className="break-words cursor-pointer" onClick={() => copyfunc(item.depositor)}>{shorten(item.depositor)}</div>
+                                    </div>
+                                );
+                            }
                         })}
                     </div>
                 </div>
 
-                <div className='tradeCard blueCover2'>
-                    <div className='tt text-xl pb-2'>Weekly Deposits</div>
+                {/* <div className='tradeCard blueCover2'>
+                    <div className='tt text-xl pb-2'>{`Weekly Deposits (${cycleNo}Cycle)`}</div>
                     <div className="flex gap-2 items-center justify-left">
                         <div className="nn text-sm min-w-[20%]">Amount</div>
                         <div className="nn text-sm min-w-[40%]">Address</div>
                     </div>
-                    {weeklyDepositsHistory.map((item, index) => {
+                    {weeklyDepositsHistory && weeklyDepositsHistory.map((item, index) => {
                         return (
                             <div className="flex gap-2 items-center justify-left py-1" key={index}>
                                 <div className="min-w-[20%]">{fromWei(item.amount)} USDC</div>
@@ -341,7 +335,7 @@ export default function Home() {
                             </div>
                         );
                     })}
-                </div>
+                </div> */}
 
                 {/*<div>
                         {loading && <LinearProgress color="secondary"/>}

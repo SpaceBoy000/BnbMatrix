@@ -38,6 +38,7 @@ const Matrices = () => {
     const [userInfo, setUserInfo] = useState([]);
     const [refLink, setRefLink] = useState('Copy Referral Link');
     const [refBonus, setRefBonus] = useState(0);
+    const [refCount, setRefCount] = useState(0);
     const [dailyProfit, setDailyProfit] = useState(0);
     const [totalActives, setTotalActives] = useState(0);
     const [totalWiths, setTotalWiths] = useState(0);
@@ -82,6 +83,8 @@ const Matrices = () => {
     })
 
     const [baseDate, setBaseDate] = useState(1687089600);
+    const [cyclePeriod, setCyclePeriod] = useState(7*86400);
+    const [weeklyProfit, setWeeklyProfit] = useState(70); // 7%
     const getCountdown = (deadline) => {
         const now = Date.now() / 1000;
         const total = deadline - now;
@@ -108,11 +111,10 @@ const Matrices = () => {
     }
 
     useEffect(() => {
-
         const curTime = parseInt(Date.now() / 1000);
         if (curTime > baseDate) {
-            const l = Math.floor((curTime - baseDate) / (86400 * 7));
-            setBaseDate(baseDate + (l+1)*86400*7);
+            const l = Math.floor((curTime - baseDate) / (cyclePeriod));
+            setBaseDate(baseDate + (l+1) * cyclePeriod);
         }
         const interval = setInterval(() => {
             try {
@@ -132,7 +134,7 @@ const Matrices = () => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [baseDate])
+    }, [baseDate, cyclePeriod])
 
     const fetchWalletBalance = async () => {
         try {
@@ -169,13 +171,13 @@ const Matrices = () => {
         try {
             const [userKey, userInfo] = await Promise.all([
                 contract.methods.UsersKey(address)
-                    .call({from: address})
+                    .call()
                     .catch((err) => {
                         console.log(err);
                         return 0;
                     }),
-                contract.methods.userInfo()
-                    .call({from: address})
+                contract.methods.userInfo(address)
+                    .call()
                     .catch((err) => {
                         console.log(err);
                         return 0;
@@ -183,19 +185,23 @@ const Matrices = () => {
             ]);
             setUsersKey(userKey);
             setUserInfo(userInfo);
+            console.log("UserInfo: ", userInfo);
             setUserTotalDeposited(fromWei(userKey.totalInits));
             setRefBonus(fromWei(userKey.refBonus));
+            setRefCount(userKey.refCount);
             setClaimables(fromWei(userKey.claimableAmount));
             setClaimable(Date.now() / 1000 > userKey.nextClaim ? true : false);
             setTotalWiths(fromWei(userKey.totalWiths));
-            let totalActives = 0;
+            let totalActives = Number(0);
+            let activeBalance, cycle;
             userInfo.forEach(item => {
-                totalActives += parseFloat(fromWei(item.curAmt));
+                [activeBalance, cycle] = calcActiveBalance(item);
+                totalActives += activeBalance;
             });
 
             console.log("totalActives: ", totalActives);
             setTotalActives(totalActives);
-            setDailyProfit(totalActives / 100);
+            setDailyProfit(totalActives * weeklyProfit / 7 / 10 / 100);
             console.log("UserKey: ", userKey);
             console.log("UserInfo: ", userInfo);
         } catch (err) {
@@ -204,9 +210,40 @@ const Matrices = () => {
     }
 
     useEffect(() => {
+        const fetchContractInfo = async () => {
+            try {
+                const [cyclePeriod, weeklyProfit] = await Promise.all([
+                    contract.methods.cyclePeriod()
+                        .call()
+                        .catch((err) => {
+                            console.log(err);
+                            return 0;
+                        }),
+                    contract.methods.weeklyProfit()
+                        .call()
+                        .catch((err) => {
+                            console.log(err);
+                            return 0;
+                        }),
+                ]);
+                setCyclePeriod(cyclePeriod);
+                setWeeklyProfit(weeklyProfit);
+                console.log("cyclePeriod: ", cyclePeriod);
+                console.log("weeklyProfit: ", weeklyProfit);
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        fetchContractInfo();
+    }, [contract]);
+
+    useEffect(() => {
         fetchWalletBalance();
-        fetchUserInfo();
     }, [tokenContract, address]);
+
+    useEffect(() => {
+        fetchUserInfo();
+    }, [contract, address, cyclePeriod]);
 
     useEffect(() => {
         const refData = async () => {
@@ -222,31 +259,7 @@ const Matrices = () => {
         refData();
     }, [address]);
 
-    // useEffect(() => {
-    //     const fetchContractInfo = async () => {
-    //         try {
-    //             const [main, userInfo] = await Promise.all([
-    //                 contract.methods.MainKey(1)
-    //                     .call({from: address})
-    //                     .catch((err) => {
-    //                         console.log(err);
-    //                         return 0;
-    //                     }),
-    //             ]);
-    //             setMain(main);
-    //             setTotalInvestment(fromWei(main.ovrTotalDeps));
-    //         } catch (err) {
-    //             console.log(err);
-    //         }
-    //     }
-    //     fetchContractInfo();
-    // }, [contract]);
-
-    const handleClickCopy = () => {
-        navigator.clipboard.writeText("https://usdc-matrix.netlify.app/?ref=");
-        // toast.success('Referral link has been copied!');
-        console.log("handleClickCopy>>>>>>>>>>>");
-    }
+    
 
     function useQuery() {
         return new URLSearchParams(useLocation().search);
@@ -255,7 +268,7 @@ const Matrices = () => {
     const getRef = () => {
         const ref = Web3.utils.isAddress(query.get("ref"))
             ? query.get("ref")
-            : '0x0000000000000000000000000000000000000000'
+            : '0x000000000000000000000000000000000000dEaD'
         return ref;
     };
 
@@ -270,8 +283,8 @@ const Matrices = () => {
         setLoading(true);
         try {
             let ref = getRef();
-            console.log("onDeposit: ", ref, address, amount, allowancement);
-            if (allowancement >= amount) {
+            console.log("onDeposit: ", ref, address, parseInt(amount), parseInt(allowancement));
+            if (parseInt(allowancement) >= parseInt(amount)) {
                 await contract.methods.Deposit(toWei(amount), ref).send({ from: address});
             } else {
                 await tokenContract.methods.approve(config.contractAddress, toWei(amount)).send({from: address});
@@ -352,21 +365,57 @@ const Matrices = () => {
         setLoading(false);
     }
 
+    const onWithdrawInitial = async (key) => {
+        setLoading(true);
+        try {
+            await contract.methods.withdrawInitial(key).send({from: address});
+            fetchWalletBalance();
+            fetchUserInfo();
+        } catch (err) {
+            console.error(err);
+        }
+        setLoading(false);
+    }
+
+    const calcActiveBalance = (item) => {
+        if (item.initialWithdrawn == true) return [0, 0];
+        
+        let activeBalance = parseFloat(fromWei(item.curAmt));
+        const BASE_SUNDAY = 1687089600
+        const curTm = parseInt(Date.now()/1000);
+        const DENOMINATOR = 1000;
+        let newCycles;
+        let cycles;
+        if (item.cycles == 0) {
+            const firstCycleDate = parseInt(BASE_SUNDAY + ((item.depoTime - BASE_SUNDAY) / cyclePeriod + 1) * cyclePeriod);
+
+            if (curTm < firstCycleDate) {
+                newCycles = 0;
+                return [activeBalance, 0];
+            } else {
+                newCycles = Math.floor((curTm - firstCycleDate) / cyclePeriod);
+                const period = Math.max(Math.floor((firstCycleDate - item.depoTime) / (cyclePeriod / 7)), 0);
+                activeBalance += parseFloat(activeBalance * period * weeklyProfit / 7  / DENOMINATOR);
+            }
+        } else {
+            newCycles = Math.floor((curTm - item.depoTime) / cyclePeriod);
+        }
+        // console.log("newCycles: ", newCycles, activeBalance, (1 + weeklyProfit / DENOMINATOR) ** newCycles);
+
+        // for (let j = 0; j < newCycles; j++) {
+        //     activeBalance += (activeBalance * weeklyProfit / DENOMINATOR);
+        // }
+
+        console.log("newCycles: ", newCycles);
+        newCycles = Math.max(newCycles, 0);
+        activeBalance = activeBalance * (1 + weeklyProfit / DENOMINATOR) ** newCycles
+
+        cycles = parseInt(item.cycles) + (item.cycles == 0 ? newCycles + 1 : newCycles);
+        return [activeBalance, cycles];
+    }
+
     return (
         <Wrapper>
-            {/* <div className='contractInfo'>
-                {
-                    contractInfos.map((item, index) => {
-                        return (
-                            <div className="contractInfoItem" key={index}>
-                                <span className="rr">{item.label}</span>
-                                <span className='tt font-bold pt-2'>{item.value + " " + item.unit} </span>
-                            </div>
-                        );
-                    })
-                }
-            </div> */}
-
             <div className='flex flex-col md:flex-row gap-4'>
                 <div className='tradeCard'>
                     <span className='tt text-xl'>Matrix</span>
@@ -384,28 +433,41 @@ const Matrices = () => {
                         <div className='tt bg-[#3574b9] text-white rounded-lg px-2 py-1 w-full text-center cursor-pointer hover:-translate-y-0.5'
                             onClick={onDeposit}
                         >
-                            Deposit
+                            {parseInt(allowancement) >= amount ? "Deposit" : "Approve"}
                         </div>
                     </div>
                 </div>
-                <div className='tradeCard flex flex-row'>
-                    <div className='w-1/2'>
-                        <div className='tt text-xl pb-4'>Referral</div>
+                <div className='tradeCard flex flex-col'>
+                    <div className='flex items-center mb-4 justify-between'>
+                        <div>
+                            <div className='tt text-xl'>Referral</div>
+                        </div>
+                        <div>
+                            <div className='nn text-sm font-thin flex items-center cursor-pointer hover:-translate-y-0.5' onClick={() => {copyfunc(refLink)}}>Referral Link<FaCopy size="1.7em" className="pl-2" /></div>
+                            {/* <div className="gap-2 items-center">
+                                <div className='tt bg-[#11b470] text-white rounded-lg px-2 py-0.5 my-3 w-full text-center min-w-[150px] cursor-pointer hover:-translate-y-0.5' onClick={onClaimRefBonus}>Claim</div>
+                                <div className='tt bg-[#3574b9] text-white rounded-lg px-2 py-0.5 my-3 w-full text-center min-w-[150px] cursor-pointer hover:-translate-y-0.5' onClick={stakeRefBonus}>Invest</div>
+                            </div> */}
+                            
+                        </div>
+                    </div>
+                    <div className='flex justify-between text-center'>
                         <div className="gap-2 items-center">
                             <div className='nn text-sm font-thin pb-1'>Referral Rewards</div>
                             <div>{refBonus} USDC</div>
                         </div>
-                    </div>
-                    <div className='w-1/2'>
-                        <div className='nn text-sm font-thin flex pb-2 items-center cursor-pointer hover:-translate-y-0.5' onClick={() => {copyfunc(refLink)}}>Referral link<FaCopy size="1.7em" className="pl-2" /></div>
                         <div className="gap-2 items-center">
-                            <div className='tt bg-[#11b470] text-white rounded-lg px-2 py-0.5 my-3 w-full text-center min-w-[150px] cursor-pointer hover:-translate-y-0.5' onClick={onClaimRefBonus}>Claim</div>
-                            <div className='tt bg-[#3574b9] text-white rounded-lg px-2 py-0.5 my-3 w-full text-center min-w-[150px] cursor-pointer hover:-translate-y-0.5' onClick={stakeRefBonus}>Invest</div>
+                            <div className='nn text-sm font-thin pb-1'>Referred Members</div>
+                            <div>{refCount} </div>
+                        </div>
+                        <div className="gap-2 items-center">
+                            <div className='nn text-sm font-thin pb-1'>Referred Amount</div>
+                            <div>{20.0 * refBonus} USDC</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='tradeCard overflow-x-scroll md:overflow-x-hidden'>
+            <div className='tradeCard overflow-x-scroll xl:overflow-x-hidden'>
                 <span className='tt text-xl pb-2'>Your Matrices</span>
                 <div className="flex justify-between text-center">
                     <div className='tt rounded-lg px-2'>
@@ -414,22 +476,22 @@ const Matrices = () => {
                     </div>
                     <div className='tt rounded-lg px-2'>
                         <div className='nn text-sm font-thin min-w-[150px]'>Currently Staked</div>
-                        <div>{totalActives} USDC</div>
+                        <div>{totalActives.toFixed(2)} USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
                         <div className='nn text-sm font-thin min-w-[150px]'>Daily Earnings</div>
-                        <div>{dailyProfit} USDC</div>
+                        <div>{dailyProfit.toFixed(2)} USDC</div>
                     </div>
                     <div className='tt rounded-lg px-2'>
                         <div className='nn text-sm font-thin min-w-[150px]'>Total Withdrawn</div>
                         <div>{totalWiths} USDC</div>
                     </div>
-                </div>
-                <div className="flex justify-between mt-3 items-center text-center">
                     <div className='tt rounded-lg px-2'>
-                        <div className='nn text-sm font-thin min-w-[200px]'>Claimable Earnings</div>
+                        <div className='nn text-sm font-thin min-w-[150px]'>Claimable Earnings</div>
                         <div className='text-center'>{claimables} USDC</div>
                     </div>
+                </div>
+                <div className="flex justify-start md:justify-evenly mt-3 items-center text-center">
                     <div className='tt rounded-lg px-2'>
                         <div className='nn text-sm font-thin min-w-[250px]'>Timer</div>
                         <div className='text-center'>{`${countdown.days}D ${countdown.hours}H ${countdown.minutes < 10 ? '0' + countdown.minutes : countdown.minutes}M ${countdown.seconds < 10 ? '0' + countdown.seconds : countdown.seconds}S`}</div>
@@ -446,38 +508,40 @@ const Matrices = () => {
                 </div>
             </div>
             {
-                userInfo.map((item, index) => {
-                    const amountInvested = fromWei(item.amt);
-                    const activeBalance = fromWei(item.curAmt);
-                    const cycles = parseInt(item.cycles) + Math.floor((Date.now() / 1000 - item.depoTime) / (86400 * 7));
-                    // const totalProfit = fromWei(item.totalProfit);
-                    return (
-                        <div className='tradeCard blueCover2 overflow-x-scroll' key={index}>
-                            <span className='tt text-xl pb-2'>Matrix {index + 1}</span>
-                            <div className="flex justify-between text-center">
-                                <div className='tt rounded-lg px-2'>
-                                    <div className='nn text-sm font-thin min-w-[150px]'>Amount Invested</div>
-                                    <div>{amountInvested} USDC</div>
-                                </div>
-                                <div className='tt rounded-lg px-2'>
-                                    <div className='nn text-sm font-thin min-w-[150px]'>Active Balance</div>
-                                    <div>{activeBalance} USDC</div>
-                                </div>
-                                <div className='tt rounded-lg px-2'>
-                                    <div className='nn text-sm font-thin min-w-[150px]'>Daily Earnings</div>
-                                    <div>{activeBalance / 100} USDC</div>
-                                </div>
-                                <div className='tt rounded-lg px-2'>
-                                    <div className='nn text-sm font-thin min-w-[150px]'>Total Profit</div>
-                                    <div className='text-red-600'>{0} USDC</div>
-                                </div>
-                                <div className='tt rounded-lg px-2'>
-                                    <div className='nn text-sm font-thin min-w-[150px]'>Unstake</div>
-                                    <div className={`${cycles > 7 ? "bg-[#11b470]" : "bg-[#ff3131]"}  tt rounded-lg px-2 py-0.5 w-full text-center cursor-pointer hover:-translate-y-0.5`}>{ cycles } Cycles</div>
+                userInfo && userInfo.map((item, index) => {
+                    if (item.initialWithdrawn == false) {
+                        const amountInvested = fromWei(item.amt);
+                        const totalProfit = fromWei(item.totalProfit);
+                        let activeBalance, cycles;
+                        [activeBalance, cycles] = calcActiveBalance(item);
+                        return (
+                            <div className='tradeCard blueCover2 overflow-x-scroll xl:overflow-x-hidden' key={index}>
+                                <span className='tt text-xl pb-2'>Matrix {index + 1}</span>
+                                <div className="flex justify-between text-center">
+                                    <div className='tt rounded-lg px-2'>
+                                        <div className='nn text-sm font-thin min-w-[150px]'>Amount Invested</div>
+                                        <div>{amountInvested} USDC</div>
+                                    </div>
+                                    <div className='tt rounded-lg px-2'>
+                                        <div className='nn text-sm font-thin min-w-[150px]'>Active Balance</div>
+                                        <div>{activeBalance.toFixed(2)} USDC</div>
+                                    </div>
+                                    <div className='tt rounded-lg px-2'>
+                                        <div className='nn text-sm font-thin min-w-[150px]'>Daily Earnings</div>
+                                        <div>{(activeBalance * weeklyProfit / 7 / 10 / 100).toFixed(2)} USDC</div>
+                                    </div>
+                                    <div className='tt rounded-lg px-2'>
+                                        <div className='nn text-sm font-thin min-w-[150px]'>Profit Claimed</div>
+                                        <div>{totalProfit} USDC</div>
+                                    </div>
+                                    <div className='tt rounded-lg px-2'>
+                                        <div className='nn text-sm font-thin min-w-[150px]'>Unstake</div>
+                                        <div className={`${cycles > 7 ? "bg-[#11b470] enabled" : "bg-[#ff3131] disabled"}  tt rounded-lg px-2 py-0.5 w-full text-center cursor-pointer hover:-translate-y-0.5`} onClick={() => {onWithdrawInitial(item.key)}}>{ cycles } Cycles</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    );
+                        );
+                    }
                 })
             }
         </Wrapper>
