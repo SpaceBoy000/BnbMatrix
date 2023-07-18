@@ -365,7 +365,15 @@ const Matrices = () => {
         setLoading(false);
     }
 
-    const onWithdrawInitial = async (key) => {
+    const onWithdrawInitial = async (key, cycles) => {
+        if (cycles < 8) {
+            Toast.fire({
+                icon: 'error',
+                title: "You can't unstake before 8 Cycles have passed."
+            });
+            
+            return;
+        }
         setLoading(true);
         try {
             await contract.methods.withdrawInitial(key).send({from: address});
@@ -536,7 +544,7 @@ const Matrices = () => {
                                     </div>
                                     <div className='tt rounded-lg px-2'>
                                         <div className='nn text-sm font-thin min-w-[150px]'>Unstake</div>
-                                        <div className={`${cycles > 7 ? "bg-[#11b470] enabled" : "bg-[#ff3131] disabled"}  tt rounded-lg px-2 py-0.5 w-full text-center cursor-pointer hover:-translate-y-0.5`} onClick={() => {onWithdrawInitial(item.key)}}>{ cycles } Cycles</div>
+                                        <div className={`${cycles > 7 ? "bg-[#11b470] enabled" : "bg-[#ff3131] disabled"}  tt rounded-lg px-2 py-0.5 w-full text-center cursor-pointer hover:-translate-y-0.5`} onClick={() => {onWithdrawInitial(item.key, cycles)}}>{ cycles } Cycles</div>
                                     </div>
                                 </div>
                             </div>
